@@ -1,0 +1,90 @@
+@import "tailwindcss";
+  @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Mitr:wght@400;600&display=swap');
+
+@theme {
+  
+  /* Color Palette */
+  --color-background: #0f172a; /* slate-900 */
+  --color-surface: #1e293b;    /* slate-800 */
+  --color-primary: #a855f7;    /* purple-500 */
+  --color-secondary: #ef4444;  /* red-500 */
+  --color-accent: #38bdf8;     /* sky-400 */
+  
+  /* Neon Accents */
+  --color-neon-purple: #a855f7;
+  --color-neon-red: #ef4444;
+  /* กำหนดสี Theme เพิ่มเติม (ถ้ายังไม่มี) */
+  --color-werewolf-red: #ff0033;
+  --color-villager-blue: #00ccff;
+
+  /* Typography */
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Cinzel", serif;
+  --font-thai: "Kanit", sans-serif;
+  --font-display: "Mitr", sans-serif; /* ใช้สำหรับหัวข้อ/ชื่อบทบาท (ดูแข็งแรง) */
+  --font-body: "Kanit", sans-serif; /* ใช้สำหรับเนื้อหา/กติกา (อ่านง่าย) */
+
+  /* Animations */
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Global Reset & Base Styles */
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background);
+  color: #e2e8f0;
+}
+
+/* Utility Classes - Glassmorphism */
+.glass-panel {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+/* Utility Classes - Neon Glows */
+.neon-text-purple {
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.7), 0 0 20px rgba(168, 85, 247, 0.5);
+}
+
+.neon-border-purple {
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4), inset 0 0 10px rgba(168, 85, 247, 0.2);
+}
+
+.neon-text-red {
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.7), 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+/* Utility Classes - 3D Transforms */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Scrollbar Hiding */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}

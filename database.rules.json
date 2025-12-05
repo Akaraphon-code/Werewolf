@@ -1,0 +1,41 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomId": {
+        // Public Game State: Readable by everyone in the room (Authenticated)
+        // Writable by authenticated users to allow joining (appending to players list)
+        "public": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
+        
+        // Private Data: WHERE ROLES ARE STORED
+        // Security Critical: Only the specific player can read their own node.
+        "private": {
+          "$playerId": {
+            // Only I can read my own role
+            ".read": "auth != null && $playerId === auth.uid",
+            // Only the Host (who owns the room) can write/assign roles
+            ".write": "auth != null && root.child('rooms').child($roomId).child('hostId').val() === auth.uid"
+          }
+        },
+
+        // Actions: Queue for Night Actions
+        "actions": {
+           // Host can read all actions to resolve them
+           ".read": "auth != null && root.child('rooms').child($roomId).child('hostId').val() === auth.uid",
+           "$playerId": {
+             // Players can only write their own action
+             ".write": "auth != null && $playerId === auth.uid"
+           }
+        },
+
+        // Host ID: Identifying who controls the game
+        "hostId": {
+          ".read": "auth != null",
+          ".write": "auth != null && (!data.exists() || data.val() === auth.uid)"
+        }
+      }
+    }
+  }
+}
