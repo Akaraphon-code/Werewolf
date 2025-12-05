@@ -8,7 +8,21 @@ export enum RoleType {
   MEDIUM = 'Medium',
   JESTER = 'Jester',
   SERIAL_KILLER = 'Serial Killer',
-  UNKNOWN = 'Unknown' // Added for masking other players
+  // Advanced Roles
+  APPRENTICE_SEER = 'Apprentice Seer',
+  MINION = 'Minion',
+  DRUNK = 'Drunk',
+  PRIEST = 'Priest',
+  TROUBLEMAKER = 'Troublemaker',
+  INSOMNIAC = 'Insomniac',
+  MASON = 'Mason',
+  // Phase 2 Roles
+  WOLF_MAN = 'Wolf Man',
+  WITCH = 'Witch',
+  DIRE_WOLF = 'Dire Wolf',
+  CHANGELING = 'Changeling',
+  
+  UNKNOWN = 'Unknown'
 }
 
 export enum GamePhase {
@@ -24,6 +38,14 @@ export enum ActionType {
   PROTECT = 'PROTECT',
   INVESTIGATE = 'INVESTIGATE',
   BLOCK = 'BLOCK',
+  CONDITIONAL_KILL = 'CONDITIONAL_KILL', // Priest, Hunter
+  TROUBLEMAKE = 'TROUBLEMAKE', // Troublemaker
+  
+  // Phase 2 Actions
+  HEAL = 'HEAL',
+  POISON = 'POISON',
+  LINK = 'LINK', // Dire Wolf, Changeling
+  
   NO_ACTION = 'NO_ACTION'
 }
 
@@ -33,6 +55,11 @@ export interface NightAction {
   targetId: string;
   type: ActionType;
   priority: number;
+}
+
+export interface Vote {
+  voterId: string;
+  targetId: string;
 }
 
 export interface PlayerFlags {
@@ -52,6 +79,15 @@ export interface Role {
   imageUrl: string;
   alignment: 'Good' | 'Evil' | 'Neutral' | 'Unknown';
   team: string; // Display team name (e.g., 'Villager Team')
+  investigationResult?: RoleType; // What the Seer sees this role as (e.g. Wolf Man -> Villager)
+}
+
+export interface PlayerAttributes {
+  hasHealPotion?: boolean;
+  hasPoisonPotion?: boolean;
+  linkedPartnerId?: string; // Dire Wolf's partner
+  changelingTargetId?: string; // Changeling's target
+  retributionTargetId?: string; // Hunter's target
 }
 
 export interface Player {
@@ -60,7 +96,11 @@ export interface Player {
   role: Role;
   isAlive: boolean;
   flags: PlayerFlags; // Reset every night
+  // Persistent State
+  hasUsedAbility?: boolean; 
+  privateResult?: string; 
   isHost?: boolean;
+  attributes?: PlayerAttributes; // Phase 2 Attributes
 }
 
 export interface GameState {
@@ -71,8 +111,10 @@ export interface GameState {
   players: Player[];
   hostPlayers?: Player[]; // Full player data for host
   actions?: NightAction[]; // Real-time actions for host
+  votes?: Record<string, string>; // Real-time votes (voterId -> targetId)
   currentTurn: number;
+  executionCount: number; // Default 1. Troublemaker can set to 2.
   nightActions: NightAction[];
   log: string[]; 
-  winner?: 'Good' | 'Evil' | null;
+  winner?: 'Good' | 'Evil' | 'Jester' | null;
 }

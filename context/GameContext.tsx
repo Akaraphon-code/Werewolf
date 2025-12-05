@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { GameState, Player, GamePhase } from '../types';
+import { GameState, Player, GamePhase, ActionType } from '../types';
 import { useGameRoom } from '../hooks/useGameRoom';
 
 // --- CONTEXT ---
@@ -9,9 +9,11 @@ interface GameContextType {
   createRoom: (name: string) => Promise<string>;
   joinRoom: (code: string, name: string) => Promise<void>;
   startGame: () => void;
-  performAction: (targetId: string) => void;
+  resetGame: () => void; 
+  performAction: (targetId: string, actionType?: ActionType) => void;
+  castVote: (targetId: string) => void; 
   advancePhase: () => void;
-  togglePlayerLife: (playerId: string, isAlive: boolean) => void; // New
+  togglePlayerLife: (playerId: string, isAlive: boolean) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -21,10 +23,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     state, 
     createRoom, 
     joinRoom, 
-    startGame, 
-    performAction, 
+    startGame,
+    resetGame, 
+    performAction,
+    castVote, 
     advancePhase,
-    togglePlayerLife // New
+    togglePlayerLife 
   } = useGameRoom();
 
   const handleCreate = async (name: string) => {
@@ -42,7 +46,9 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         createRoom: handleCreate, 
         joinRoom: handleJoin, 
         startGame, 
-        performAction, 
+        resetGame,
+        performAction,
+        castVote,
         advancePhase,
         togglePlayerLife
       }}

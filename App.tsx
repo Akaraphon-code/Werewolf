@@ -4,12 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LobbyScreen from './components/LobbyScreen';
 import RoleCard from './components/RoleCard';
 import HostDashboard from './components/HostDashboard';
+import VotingScreen from './components/VotingScreen';
+import GameOverScreen from './components/GameOverScreen'; 
 import Button from './components/Button';
-import { GamePhase, RoleType } from './types';
-import { ArrowLeft, Skull, Crown } from 'lucide-react';
+import { GamePhase, RoleType, ActionType } from './types';
+import { ArrowLeft, Skull, Crown, FlaskConical, Link2 } from 'lucide-react';
 import { useGame } from './context/GameContext';
 
-// Background Particles Component
 const Particles = () => {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -43,14 +44,14 @@ const Particles = () => {
 };
 
 export default function App() {
-  const { state, createRoom, joinRoom, startGame, performAction, advancePhase } = useGame();
+  const { state, createRoom, joinRoom, performAction, resetGame } = useGame();
   
-  // Local state for UI flow
+  // Local state for Witch Action Mode (Heal vs Poison)
+  const [witchMode, setWitchMode] = useState<ActionType.HEAL | ActionType.POISON>(ActionType.POISON);
+
   const me = state.players.find(p => p.id === state.playerId);
 
   const handleJoinGame = async (name: string, code: string) => {
-    // Determine if creating or joining based on logic (simplified for UI)
-    // For this demo, let's assume if code is "NEW", we create.
     if (code === "NEW") {
        await createRoom(name);
     } else {
@@ -59,21 +60,52 @@ export default function App() {
   };
 
   const handleAction = (targetId: string) => {
-      performAction(targetId);
+      // Witch Custom Logic
+      if (me?.role.type === RoleType.WITCH) {
+        performAction(targetId, witchMode);
+      } else {
+        performAction(targetId);
+      }
   };
 
   const getPhaseMessage = () => {
     if (state.phase === GamePhase.GAME_OVER) {
+      if (state.winner === 'Jester') return 'JESTER WINS! (โดนต้มซะเปื่อย)';
       return state.winner === 'Good' ? 'The Village Survives!' : 'The Werewolves Feast!';
     }
     if (state.phase === GamePhase.LOBBY) return "Waiting for Host to start...";
     if (state.phase === GamePhase.NIGHT) return "It is Night. Silence falls.";
-    if (state.phase === GamePhase.DAY) return "Day breaks. Who is guilty?";
+    if (state.phase === GamePhase.DAY) return "Day breaks. Discuss!";
+    if (state.phase === GamePhase.VOTING) return "Judgment Time. Vote now.";
     return "Loading...";
+  };
+
+  // Helper to determine if action is allowed
+  const canAct = () => {
+    if (!me?.isAlive || state.phase !== GamePhase.NIGHT) return false;
+    if (me.role.type === RoleType.VILLAGER || me.role.type === RoleType.MASON || me.role.type === RoleType.INSOMNIAC || me.role.type === RoleType.MINION) return false;
+    
+    // One-time Night 1 Roles
+    if (me.role.type === RoleType.DIRE_WOLF && me.attributes?.linkedPartnerId) return false;
+    if (me.role.type === RoleType.CHANGELING && me.attributes?.changelingTargetId) return false;
+    
+    return true;
   };
 
   // --- HOST VIEW ---
   if (state.isHost) {
+      if (state.phase === GamePhase.GAME_OVER) {
+          return (
+             <div className="min-h-screen w-full bg-slate-900 text-slate-200">
+               <GameOverScreen 
+                 winner={state.winner || null} 
+                 players={state.players} 
+                 onReset={resetGame} 
+                 isHost={true} 
+               />
+             </div>
+          );
+      }
       return <HostDashboard />;
   }
 
@@ -82,7 +114,6 @@ export default function App() {
     <div className="relative min-h-screen w-full bg-background overflow-hidden font-sans text-slate-200">
       <Particles />
       
-      {/* Decorative Gradient Overlay */}
       <div className="fixed inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none z-0" />
 
       <AnimatePresence mode="wait">
@@ -106,99 +137,164 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6"
           >
-            <div className="w-full max-w-md mx-auto h-full flex flex-col">
-              
-              {/* Header */}
-              <div className="flex justify-between items-center mb-6 pt-4">
-                <Button 
-                  variant="ghost"
-                  className="!w-auto !py-2 !px-3"
-                  onClick={() => window.location.reload()}
-                >
-                  <ArrowLeft className="w-6 h-6" />
-                </Button>
-                <div className="text-right">
-                  <div className="text-xs text-slate-500 uppercase tracking-widest">Room</div>
-                  <div className="text-purple-400 font-mono font-bold tracking-widest text-xl">{state.roomCode}</div>
-                </div>
-              </div>
-
-              {/* Status Banner */}
-               {!me.isAlive && (
-                <div className="bg-red-900/50 border border-red-500/50 text-red-200 p-3 rounded-lg text-center mb-4 flex items-center justify-center gap-2">
-                  <Skull className="w-5 h-5" />
-                  <span className="font-display font-bold">YOU ARE DEAD</span>
-                </div>
-              )}
-
-              {state.phase === GamePhase.LOBBY && (
-                  <div className="flex-grow flex flex-col items-center justify-center">
-                      <h2 className="text-2xl font-display mb-4">Lobby</h2>
-                      <div className="space-y-2 w-full">
-                          {state.players.map(p => (
-                              <div key={p.id} className="p-3 bg-slate-800/50 rounded-lg flex items-center gap-3 border border-white/5">
-                                  <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
-                                      {p.name.charAt(0)}
-                                  </div>
-                                  <span className="flex-grow">{p.name}</span>
-                                  {p.isHost && <Crown className="w-4 h-4 text-yellow-500" />}
-                              </div>
-                          ))}
-                      </div>
-                      <p className="mt-8 text-slate-500 animate-pulse">Waiting for host to start...</p>
-                  </div>
-              )}
-
-              {state.phase !== GamePhase.LOBBY && (
-                <>
-                  {/* Main Content Area */}
-                  <div className="flex-grow flex items-center justify-center py-4 perspective-container">
-                    <RoleCard role={me.role} />
+            {/* GAME OVER SCREEN FOR PLAYERS */}
+            {state.phase === GamePhase.GAME_OVER ? (
+               <GameOverScreen 
+                 winner={state.winner || null} 
+                 players={state.players} 
+                 onReset={() => {}} 
+                 isHost={false} 
+               />
+            ) : (
+                <div className="w-full max-w-md mx-auto h-full flex flex-col">
+                  {/* Header */}
+                  <div className="flex justify-between items-center mb-6 pt-4">
+                    <Button 
+                      variant="ghost"
+                      className="!w-auto !py-2 !px-3"
+                      onClick={() => window.location.reload()}
+                    >
+                      <ArrowLeft className="w-6 h-6" />
+                    </Button>
+                    <div className="text-right">
+                      <div className="text-xs text-slate-500 uppercase tracking-widest">Room</div>
+                      <div className="text-purple-400 font-mono font-bold tracking-widest text-xl">{state.roomCode}</div>
+                    </div>
                   </div>
 
-                  {/* Action Targets (If Night) */}
-                  {state.phase === GamePhase.NIGHT && me.isAlive && me.role.type !== RoleType.VILLAGER && (
-                       <div className="mb-4 w-full">
-                           <p className="text-center text-sm mb-2 text-purple-400">Select Target:</p>
-                           <div className="grid grid-cols-2 gap-2">
-                               {state.players.filter(p => p.id !== me.id && p.isAlive).map(p => (
-                                   <button 
-                                      key={p.id}
-                                      onClick={() => handleAction(p.id)}
-                                      className="p-2 bg-slate-800 hover:bg-purple-900/50 border border-slate-700 rounded text-xs transition-colors"
-                                   >
-                                       {p.name}
-                                   </button>
-                               ))}
-                           </div>
-                       </div>
+                  {/* Status Banner */}
+                  {!me.isAlive && (
+                    <div className="bg-red-900/50 border border-red-500/50 text-red-200 p-3 rounded-lg text-center mb-4 flex items-center justify-center gap-2">
+                      <Skull className="w-5 h-5" />
+                      <span className="font-display font-bold">YOU ARE DEAD</span>
+                    </div>
                   )}
 
-                  {/* Game Log (Small) */}
-                  <div className="h-24 overflow-y-auto glass-panel rounded-lg p-2 mb-4 text-xs font-mono text-slate-400">
-                    {state.log.map((entry, i) => (
-                      <div key={i} className="mb-1 border-b border-white/5 pb-1">{entry}</div>
-                    ))}
-                  </div>
+                  {/* Lobby Wait */}
+                  {state.phase === GamePhase.LOBBY && (
+                      <div className="flex-grow flex flex-col items-center justify-center">
+                          <h2 className="text-2xl font-display mb-4">Lobby</h2>
+                          <div className="space-y-2 w-full">
+                              {state.players.map(p => (
+                                  <div key={p.id} className="p-3 bg-slate-800/50 rounded-lg flex items-center gap-3 border border-white/5">
+                                      <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
+                                          {p.name.charAt(0)}
+                                      </div>
+                                      <span className="flex-grow">{p.name}</span>
+                                      {p.isHost && <Crown className="w-4 h-4 text-yellow-500" />}
+                                  </div>
+                              ))}
+                          </div>
+                          <p className="mt-8 text-slate-500 animate-pulse">Waiting for host to start...</p>
+                      </div>
+                  )}
 
-                  {/* Footer Actions */}
-                  <div className="mt-2 mb-6 space-y-4">
-                    <div className="text-center mb-4">
-                      <p className="text-slate-400 text-sm animate-pulse font-display tracking-widest uppercase">
-                        {getPhaseMessage()}
-                      </p>
-                    </div>
-                    
-                    {/* Phase Indicator */}
-                    <div className="flex justify-center gap-2 mt-4">
-                      <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${state.phase === GamePhase.NIGHT ? 'bg-purple-500 shadow-[0_0_10px_#a855f7]' : 'bg-slate-700'}`} />
-                      <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${state.phase === GamePhase.DAY ? 'bg-yellow-500 shadow-[0_0_10px_#eab308]' : 'bg-slate-700'}`} />
-                    </div>
-                  </div>
-                </>
-              )}
-              
-            </div>
+                  {/* MAIN GAME PHASES */}
+                  {state.phase !== GamePhase.LOBBY && (
+                    <>
+                      {/* Voting Phase: Show Voting Screen */}
+                      {state.phase === GamePhase.VOTING && me.isAlive ? (
+                        <VotingScreen />
+                      ) : (
+                        /* Default/Night Phase: Show Role Card & Actions */
+                        <div className="flex-grow flex flex-col items-center justify-center">
+                          <div className="flex-grow flex items-center justify-center py-4 perspective-container w-full">
+                            <RoleCard role={me.role} />
+                          </div>
+                          
+                          {/* Private Results / Messages */}
+                          {me.privateResult && state.phase === GamePhase.DAY && (
+                             <div className="mb-4 w-full bg-purple-900/20 border border-purple-500/50 p-3 rounded text-sm text-purple-200 text-center">
+                                {me.privateResult}
+                             </div>
+                          )}
+
+                          {/* Night Actions */}
+                          {state.phase === GamePhase.NIGHT && canAct() && (
+                              <div className="mb-4 w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                  
+                                  {/* Special Controls for Witch */}
+                                  {me.role.type === RoleType.WITCH && (
+                                    <div className="flex gap-2 mb-3 bg-slate-800 p-1 rounded-lg">
+                                       <button 
+                                         onClick={() => setWitchMode(ActionType.POISON)}
+                                         disabled={!me.attributes?.hasPoisonPotion}
+                                         className={`flex-1 py-2 text-xs font-bold uppercase rounded transition-all ${witchMode === ActionType.POISON ? 'bg-red-600 text-white shadow-lg' : 'text-slate-500 hover:text-red-400'} disabled:opacity-30 disabled:cursor-not-allowed`}
+                                       >
+                                         Poison (Kill)
+                                       </button>
+                                       <button 
+                                         onClick={() => setWitchMode(ActionType.HEAL)}
+                                         disabled={!me.attributes?.hasHealPotion}
+                                         className={`flex-1 py-2 text-xs font-bold uppercase rounded transition-all ${witchMode === ActionType.HEAL ? 'bg-green-500 text-white shadow-lg' : 'text-slate-500 hover:text-green-400'} disabled:opacity-30 disabled:cursor-not-allowed`}
+                                       >
+                                         Heal (Save)
+                                       </button>
+                                    </div>
+                                  )}
+
+                                  <div className="flex items-center gap-2 mb-2 justify-center">
+                                      {me.role.type === RoleType.WITCH ? (
+                                         <FlaskConical className={`w-4 h-4 ${witchMode === ActionType.POISON ? 'text-red-500' : 'text-green-500'}`} />
+                                      ) : me.role.type === RoleType.DIRE_WOLF || me.role.type === RoleType.CHANGELING ? (
+                                         <Link2 className="w-4 h-4 text-blue-400" />
+                                      ) : null}
+                                      
+                                      <p className="text-center text-sm text-purple-400 font-bold uppercase tracking-wider">
+                                        {me.role.type === RoleType.DIRE_WOLF ? "Select Partner" : 
+                                         me.role.type === RoleType.CHANGELING ? "Select Target" : 
+                                         "Select Target"}
+                                      </p>
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                                      {state.players.filter(p => p.id !== me.id && p.isAlive).map(p => (
+                                          <button 
+                                              key={p.id}
+                                              onClick={() => handleAction(p.id)}
+                                              className="p-3 bg-slate-800 hover:bg-purple-900/50 border border-slate-700 hover:border-purple-500/50 rounded text-sm transition-all font-thai"
+                                          >
+                                              {p.name}
+                                          </button>
+                                      ))}
+                                  </div>
+                              </div>
+                          )}
+                          
+                          {/* Messages for Night 1 roles that are done */}
+                          {state.phase === GamePhase.NIGHT && me.isAlive && 
+                             (me.role.type === RoleType.DIRE_WOLF && me.attributes?.linkedPartnerId) && (
+                             <div className="text-center text-xs text-slate-500 mt-2">Partner Selected. Waiting for night to end.</div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Game Log */}
+                      <div className="h-24 overflow-y-auto glass-panel rounded-lg p-2 mb-4 text-xs font-mono text-slate-400">
+                        {state.log.map((entry, i) => (
+                          <div key={i} className="mb-1 border-b border-white/5 pb-1">{entry}</div>
+                        ))}
+                      </div>
+
+                      {/* Footer */}
+                      <div className="mt-2 mb-6 space-y-4">
+                        <div className="text-center mb-4">
+                          <p className="text-slate-400 text-sm animate-pulse font-display tracking-widest uppercase">
+                            {getPhaseMessage()}
+                          </p>
+                        </div>
+                        
+                        <div className="flex justify-center gap-2 mt-4">
+                          <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${state.phase === GamePhase.NIGHT ? 'bg-purple-500 shadow-[0_0_10px_#a855f7]' : 'bg-slate-700'}`} />
+                          <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${state.phase === GamePhase.DAY ? 'bg-yellow-500 shadow-[0_0_10px_#eab308]' : 'bg-slate-700'}`} />
+                          <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${state.phase === GamePhase.VOTING ? 'bg-red-500 shadow-[0_0_10px_#ef4444]' : 'bg-slate-700'}`} />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  
+                </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
