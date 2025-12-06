@@ -57,7 +57,17 @@ export const useGameRoom = () => {
       isAlive: true,
       isHost: true,
       role: ROLES[RoleType.UNKNOWN],
-      flags: { isProtected: false, isRoleblocked: false, isMarkedForDeath: false, isRevealed: false, isDoomed: false }
+      flags: { 
+        isProtected: false, 
+        isRoleblocked: false, 
+        isMarkedForDeath: false, 
+        isRevealed: false, 
+        isDoomed: false,
+        isBanished: false,
+        isSilenced: false,
+        isVampireBit: false,
+        isProtectedFromWolvesOnly: false
+      }
     };
     const updates: any = {};
     updates[`rooms/${code}/public`] = {
@@ -86,7 +96,17 @@ export const useGameRoom = () => {
         name: playerName,
         isAlive: true,
         role: ROLES[RoleType.UNKNOWN],
-        flags: { isProtected: false, isRoleblocked: false, isMarkedForDeath: false, isRevealed: false, isDoomed: false }
+        flags: { 
+          isProtected: false, 
+          isRoleblocked: false, 
+          isMarkedForDeath: false, 
+          isRevealed: false, 
+          isDoomed: false,
+          isBanished: false,
+          isSilenced: false,
+          isVampireBit: false,
+          isProtectedFromWolvesOnly: false
+        }
       };
       await update(ref(db), {
         [`rooms/${code}/public/players`]: [...currentPlayers, newPlayer]
@@ -179,7 +199,17 @@ export const useGameRoom = () => {
       ...p,
       isAlive: true,
       role: ROLES[RoleType.UNKNOWN],
-      flags: { isProtected: false, isRoleblocked: false, isMarkedForDeath: false, isRevealed: false, isDoomed: false },
+      flags: { 
+        isProtected: false, 
+        isRoleblocked: false, 
+        isMarkedForDeath: false, 
+        isRevealed: false, 
+        isDoomed: false,
+        isBanished: false,
+        isSilenced: false,
+        isVampireBit: false,
+        isProtectedFromWolvesOnly: false
+      },
       hasUsedAbility: false,
       privateResult: '',
       attributes: {}

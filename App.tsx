@@ -70,13 +70,13 @@ export default function App() {
 
   const getPhaseMessage = () => {
     if (state.phase === GamePhase.GAME_OVER) {
-      if (state.winner === 'Jester') return 'The Madman Reigns! (ชัยชนะของตัวตลก)';
-      return state.winner === 'Good' ? 'Light Prevails! (แสงสว่างขับไล่ความมืด)' : 'Eternal Darkness! (รัตติกาลนิรันดร์)';
+      if (state.winner === 'Jester') return 'ตัวตลกเป็นฝ่ายชนะ!';
+      return state.winner === 'Good' ? 'ฝ่ายชาวบ้านชนะ!' : 'ฝ่ายหมาป่าชนะ!';
     }
-    if (state.phase === GamePhase.LOBBY) return "Awaiting the Coven...";
-    if (state.phase === GamePhase.NIGHT) return "The Dead of Night (รัตติกาลอำมหิต)";
-    if (state.phase === GamePhase.DAY) return "Daybreak Judgment (รุ่งสางแห่งการพิพากษา)";
-    if (state.phase === GamePhase.VOTING) return "Execution Hour (ลานประหาร)";
+    if (state.phase === GamePhase.LOBBY) return "Waiting for host...";
+    if (state.phase === GamePhase.NIGHT) return "Night Phase (กลางคืน)";
+    if (state.phase === GamePhase.DAY) return "Day Phase (กลางวัน)";
+    if (state.phase === GamePhase.VOTING) return "Voting Phase (โหวตประหาร)";
     return "Loading...";
   };
 
@@ -158,7 +158,7 @@ export default function App() {
                       <span className="sr-only">Leave Room</span>
                     </Button>
                     <div className="text-right">
-                      <div className="text-xs text-slate-500 uppercase tracking-widest font-header">Coven Code</div>
+                      <div className="text-xs text-slate-500 uppercase tracking-widest font-header">Room Code</div>
                       <div className="text-purple-400 font-mono font-bold tracking-widest text-xl">{state.roomCode}</div>
                     </div>
                   </div>
@@ -167,14 +167,14 @@ export default function App() {
                   {!me.isAlive && (
                     <div className="bg-red-900/50 border border-red-500/50 text-red-200 p-3 rounded-lg text-center mb-4 flex items-center justify-center gap-2 font-header">
                       <Skull className="w-5 h-5" />
-                      <span className="font-bold">YOUR SOUL IS LOST (เสียชีวิต)</span>
+                      <span className="font-bold">เสียชีวิต (DEAD)</span>
                     </div>
                   )}
 
                   {/* Lobby Wait */}
                   {state.phase === GamePhase.LOBBY && (
                       <div className="flex-grow flex flex-col items-center justify-center">
-                          <h2 className="text-3xl font-display mb-4 font-header text-purple-400">Gathering Shadows</h2>
+                          <h2 className="text-3xl font-display mb-4 font-header text-purple-400">Lobby (ห้องรอ)</h2>
                           <div className="space-y-2 w-full">
                               {state.players.map(p => (
                                   <div key={p.id} className="p-3 bg-slate-800/50 rounded-lg flex items-center gap-3 border border-white/5 font-header">
@@ -186,7 +186,7 @@ export default function App() {
                                   </div>
                               ))}
                           </div>
-                          <p className="mt-8 text-slate-500 animate-pulse font-header">Waiting for the ritual to begin...</p>
+                          <p className="mt-8 text-slate-500 animate-pulse font-header">รอโฮสต์เริ่มเกม...</p>
                       </div>
                   )}
 
@@ -242,9 +242,9 @@ export default function App() {
                                       ) : null}
                                       
                                       <p className="text-center text-sm text-purple-400 font-bold uppercase tracking-wider font-header">
-                                        {me.role.type === RoleType.DIRE_WOLF ? "Select Soulbound" : 
-                                         me.role.type === RoleType.CHANGELING ? "Select Host" : 
-                                         "Select Victim/Target"}
+                                        {me.role.type === RoleType.DIRE_WOLF ? "เลือกคู่หู (Select Partner)" : 
+                                         me.role.type === RoleType.CHANGELING ? "เลือกเป้าหมาย (Select Target)" : 
+                                         "เลือกเป้าหมาย (Select Target)"}
                                       </p>
                                   </div>
 
@@ -265,7 +265,7 @@ export default function App() {
                           {/* Messages for Night 1 roles that are done */}
                           {state.phase === GamePhase.NIGHT && me.isAlive && 
                              (me.role.type === RoleType.DIRE_WOLF && me.attributes?.linkedPartnerId) && (
-                             <div className="text-center text-xs text-slate-500 mt-2 font-header">Soulbound active. The pact is sealed.</div>
+                             <div className="text-center text-xs text-slate-500 mt-2 font-header">พันธะสัญญาเสร็จสมบูรณ์</div>
                           )}
                         </div>
                       )}

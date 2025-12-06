@@ -8,7 +8,8 @@ export enum RoleType {
   MEDIUM = 'Medium',
   JESTER = 'Jester',
   SERIAL_KILLER = 'Serial Killer',
-  // Advanced Roles
+  
+  // Advanced Roles (Original)
   APPRENTICE_SEER = 'Apprentice Seer',
   MINION = 'Minion',
   DRUNK = 'Drunk',
@@ -16,11 +17,46 @@ export enum RoleType {
   TROUBLEMAKER = 'Troublemaker',
   INSOMNIAC = 'Insomniac',
   MASON = 'Mason',
-  // Phase 2 Roles
+  
+  // Phase 2 Roles (Original)
   WOLF_MAN = 'Wolf Man',
   WITCH = 'Witch',
   DIRE_WOLF = 'Dire Wolf',
   CHANGELING = 'Changeling',
+
+  // --- NEW EXPANSION ROLES ---
+  
+  // Group A: Villager Team
+  AURA_SEER = 'Aura Seer',
+  BEHOLDER = 'Beholder',
+  CUPID = 'Cupid',
+  DISEASED = 'Diseased',
+  HUNTRESS = 'Huntress',
+  OLD_WOMAN = 'Old Woman',
+  PACIFIST = 'Pacifist',
+  PARANORMAL_INVESTIGATOR = 'Paranormal Investigator',
+  PRINCE = 'Prince',
+  REVEALER = 'Revealer',
+  SPELLCASTER = 'Spellcaster',
+  TOUGH_GUY = 'Tough Guy',
+  VILLAGER_IDIOT = 'Villager Idiot',
+  LYCAN = 'Lycan',
+
+  // Group B: Self/Neutral
+  CHUPACABRA = 'Chupacabra',
+  CULT_LEADER = 'Cult Leader',
+  HOODLUM = 'Hoodlum',
+  LONE_WOLF = 'Lone Wolf',
+  TANNER = 'Tanner',
+  VAMPIRE = 'Vampire',
+
+  // Group C: Hybrid
+  CURSED = 'Cursed',
+  DOPPELGANGER = 'Doppelganger',
+
+  // Group D: Wolf Team
+  SORCERESS = 'Sorceress',
+  WOLF_CUB = 'Wolf Cub',
   
   UNKNOWN = 'Unknown'
 }
@@ -44,7 +80,14 @@ export enum ActionType {
   // Phase 2 Actions
   HEAL = 'HEAL',
   POISON = 'POISON',
-  LINK = 'LINK', // Dire Wolf, Changeling
+  LINK = 'LINK', // Dire Wolf, Changeling, Cupid
+  
+  // Expansion Actions
+  BANISH = 'BANISH', // Old Woman
+  SILENCE = 'SILENCE', // Spellcaster
+  CONVERT = 'CONVERT', // Cult Leader
+  CHECK_AURA = 'CHECK_AURA', // Aura Seer
+  CHECK_PARANORMAL = 'CHECK_PARANORMAL', // Paranormal Investigator
   
   NO_ACTION = 'NO_ACTION'
 }
@@ -55,6 +98,7 @@ export interface NightAction {
   targetId: string;
   type: ActionType;
   priority: number;
+  additionalTargetId?: string; // For Cupid (2 targets)
 }
 
 export interface Vote {
@@ -68,6 +112,12 @@ export interface PlayerFlags {
   isMarkedForDeath: boolean;
   isDoomed: boolean; // Cannot be saved
   isRevealed: boolean;
+  
+  // Expansion Flags
+  isBanished: boolean; // Old Woman effect
+  isSilenced: boolean; // Spellcaster effect
+  isVampireBit: boolean; // Vampire effect
+  isProtectedFromWolvesOnly: boolean; // Specific protection
 }
 
 export interface Role {
@@ -78,16 +128,24 @@ export interface Role {
   ability: string; // Short ability description
   imageUrl: string;
   alignment: 'Good' | 'Evil' | 'Neutral' | 'Unknown';
-  team: string; // Display team name (e.g., 'Villager Team')
-  investigationResult?: RoleType; // What the Seer sees this role as (e.g. Wolf Man -> Villager)
+  team: string; // Display team name
+  investigationResult?: RoleType; // What the Seer sees this role as
 }
 
 export interface PlayerAttributes {
   hasHealPotion?: boolean;
   hasPoisonPotion?: boolean;
-  linkedPartnerId?: string; // Dire Wolf's partner
-  changelingTargetId?: string; // Changeling's target
-  retributionTargetId?: string; // Hunter's target
+  linkedPartnerId?: string; // Dire Wolf
+  changelingTargetId?: string; // Changeling
+  retributionTargetId?: string; // Hunter
+  
+  // Expansion Attributes
+  loversId?: string; // Cupid Link
+  isCultMember?: boolean; // Cult Leader
+  hoodlumTargets?: string[]; // Hoodlum
+  toughGuyDeathTurn?: number; // Tough Guy delayed death
+  doppelgangerTargetId?: string; // Doppelganger
+  isDiseased?: boolean; // Trigger for disabling wolves
 }
 
 export interface Player {
@@ -100,7 +158,7 @@ export interface Player {
   hasUsedAbility?: boolean; 
   privateResult?: string; 
   isHost?: boolean;
-  attributes?: PlayerAttributes; // Phase 2 Attributes
+  attributes?: PlayerAttributes; 
 }
 
 export interface GameState {
@@ -113,8 +171,12 @@ export interface GameState {
   actions?: NightAction[]; // Real-time actions for host
   votes?: Record<string, string>; // Real-time votes (voterId -> targetId)
   currentTurn: number;
-  executionCount: number; // Default 1. Troublemaker can set to 2.
+  executionCount: number; 
   nightActions: NightAction[];
   log: string[]; 
-  winner?: 'Good' | 'Evil' | 'Jester' | null;
+  winner?: 'Good' | 'Evil' | 'Jester' | 'Cult' | 'Lovers' | 'Tanner' | 'Hoodlum' | 'Lone Wolf' | 'Chupacabra' | null;
+  
+  // Global Effects
+  wolvesDisabled?: boolean; // Diseased effect
+  wolfExtraKills?: number; // Wolf Cub effect
 }

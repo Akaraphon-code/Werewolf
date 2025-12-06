@@ -35,11 +35,11 @@ const HostDashboard: React.FC = () => {
 
   const getPhaseLabel = (phase: GamePhase) => {
     switch (phase) {
-      case GamePhase.LOBBY: return 'Gathering Shadows (จุดรวมพลก่อนค่ำ)';
-      case GamePhase.NIGHT: return 'The Dead of Night (รัตติกาลอำมหิต)';
-      case GamePhase.DAY: return 'Daybreak Judgment (รุ่งสางแห่งการพิพากษา)';
-      case GamePhase.VOTING: return 'Execution Hour (ลานประหาร)';
-      case GamePhase.GAME_OVER: return 'The End (บทสรุปโศกนาฏกรรม)';
+      case GamePhase.LOBBY: return 'Lobby (รอเริ่มเกม)';
+      case GamePhase.NIGHT: return 'Night (กลางคืน)';
+      case GamePhase.DAY: return 'Day (กลางวัน)';
+      case GamePhase.VOTING: return 'Voting (โหวต)';
+      case GamePhase.GAME_OVER: return 'Game Over (จบเกม)';
       default: return phase;
     }
   };
@@ -84,7 +84,7 @@ const HostDashboard: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-xs text-slate-500 uppercase tracking-widest hidden sm:block font-header">
-            Dungeon Master Control
+            Host Control
           </div>
           <button 
              onClick={leaveRoom}
@@ -116,7 +116,7 @@ const HostDashboard: React.FC = () => {
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
-                      player.role.team.includes('Pack') || player.role.team.includes('Evil')
+                      player.role.team.includes('Werewolf') || player.role.team.includes('Evil')
                         ? 'bg-red-500/20 text-red-500'
                         : 'bg-blue-500/20 text-blue-400'
                     }`}>
@@ -144,14 +144,14 @@ const HostDashboard: React.FC = () => {
 
                 <div className="space-y-2 mt-4 bg-slate-900/50 p-3 rounded-lg text-xs font-header">
                   <div className="flex justify-between">
-                     <span className="text-slate-500">Soul Status:</span>
+                     <span className="text-slate-500">Status:</span>
                      <span className={player.isAlive ? "text-green-400" : "text-red-500"}>
-                       {player.isAlive ? "Alive" : "Deceased"}
+                       {player.isAlive ? "Alive" : "Dead"}
                      </span>
                   </div>
                   {state.phase === GamePhase.NIGHT && (
                     <div className="flex justify-between">
-                       <span className="text-slate-500">Target:</span>
+                       <span className="text-slate-500">Action:</span>
                        <span className="text-purple-300 font-mono">
                          {getActionTargetName(player.id)}
                        </span>
@@ -192,7 +192,7 @@ const HostDashboard: React.FC = () => {
                 })}
              </div>
              <div className="mt-8 p-4 bg-slate-900 rounded-lg border border-slate-700">
-                <p className="text-xs text-slate-500 uppercase tracking-widest mb-2 font-header">Total Condemnations</p>
+                <p className="text-xs text-slate-500 uppercase tracking-widest mb-2 font-header">Total Votes</p>
                 <p className="text-3xl font-mono text-white">{Object.keys(state.votes || {}).length} / {players.filter(p=>p.isAlive).length}</p>
              </div>
           </div>
@@ -209,7 +209,7 @@ const HostDashboard: React.FC = () => {
             disabled={state.phase !== GamePhase.LOBBY && state.phase !== GamePhase.GAME_OVER}
           >
             <div className="flex flex-col items-center leading-none py-1">
-              <span className="text-lg font-header">Unleash the Beast (ปลดปล่อยปีศาจ)</span>
+              <span className="text-lg font-header">Start Game (เริ่มเกม)</span>
             </div>
           </Button>
 
@@ -226,11 +226,11 @@ const HostDashboard: React.FC = () => {
              <div className="flex flex-col items-center leading-none py-1">
               <span className="text-lg font-header">
                 {state.phase === GamePhase.NIGHT 
-                  ? "Dawn Approaches (เช้า)" 
+                  ? "Go to Morning (ไปตอนเช้า)" 
                   : state.phase === GamePhase.DAY 
-                    ? "Call for Judgment (เริ่มโหวต)" 
+                    ? "Start Voting (เริ่มโหวต)" 
                     : state.phase === GamePhase.VOTING
-                    ? "Execute & Nightfall (ประหาร & ค่ำ)"
+                    ? "Execute (ประหาร)"
                     : "Next Phase"}
               </span>
             </div>

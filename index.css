@@ -1,5 +1,5 @@
+
 @import "tailwindcss";
-  @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Mitr:wght@400;600&display=swap');
 
 @theme {
   
@@ -13,18 +13,17 @@
   /* Neon Accents */
   --color-neon-purple: #a855f7;
   --color-neon-red: #ef4444;
-  /* กำหนดสี Theme เพิ่มเติม (ถ้ายังไม่มี) */
-  --color-werewolf-red: #ff0033;
-  --color-villager-blue: #00ccff;
 
   /* Typography */
   --font-sans: "Inter", sans-serif;
   --font-display: "Cinzel", serif;
   --font-thai: "Kanit", sans-serif;
-  --font-header: "Fahkwang", sans-serif; /* New Gothic Header Font */
-  --font-horror: "Charmonman", cursive; /* New Gothic Horror Font */
   
-  /* Update legacy mappings to use new style where appropriate */
+  /* Theme Fonts */
+  --font-header: "Fahkwang", sans-serif; /* Clean, modern Thai font for headers */
+  --font-horror: "Charmonman", cursive; /* Spooky font for flavor text only */
+  
+  /* Map body to header font for consistent Thai UI */
   --font-body: "Fahkwang", sans-serif; 
 
   /* Animations */

@@ -26,6 +26,7 @@ export abstract class RoleStrategy {
 
   canTarget(actor: Player, target: Player): boolean {
     if (!target.isAlive) return false;
+    // Standard rule: Cannot target self unless specified
     if (actor.id === target.id) return false;
     return true;
   }
@@ -44,7 +45,7 @@ export abstract class RoleStrategy {
   abstract execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void;
 }
 
-// --- CONCRETE STRATEGIES ---
+// --- ORIGINAL STRATEGIES ---
 
 export class BodyguardStrategy extends RoleStrategy {
   type = RoleType.BODYGUARD;
@@ -66,9 +67,6 @@ export class WerewolfStrategy extends RoleStrategy {
   }
 }
 
-// Phase 2: Wolf Man shares Werewolf Strategy for killing (if group vote), 
-// but usually Wolf Man acts as a regular wolf or just passive. 
-// We assign WerewolfStrategy to them for simplicity if they lead the kill.
 export class WolfManStrategy extends RoleStrategy {
   type = RoleType.WOLF_MAN;
   priority = 5;
@@ -96,8 +94,6 @@ export class SeerStrategy extends RoleStrategy {
   getActionType() { return ActionType.INVESTIGATE; }
   execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
     if (actorFlags.isRoleblocked) return;
-    // Logic handled in ResolutionEngine, but basically reveals info.
-    // Flagging as revealed for internal tracking
     targetFlags.isRevealed = true;
   }
 }
@@ -106,21 +102,13 @@ export class PriestStrategy extends RoleStrategy {
   type = RoleType.PRIEST;
   priority = 4;
   getActionType() { return ActionType.CONDITIONAL_KILL; }
-  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
-    // Logic handled in ResolutionEngine due to "Suicide" mechanics
-  }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
 }
 
 export class ApprenticeSeerStrategy extends RoleStrategy {
   type = RoleType.APPRENTICE_SEER;
   priority = 10;
   getActionType() { return ActionType.INVESTIGATE; }
-  canTarget(actor: Player, target: Player): boolean {
-    // Apprentice only active if promoted (which changes RoleType to SEER) 
-    // OR if using one-time ability (old mechanic). 
-    // Phase 2 mechanic: "Inherits". If inherited, role changes to SEER, so this strat might not run.
-    return super.canTarget(actor, target);
-  }
   execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
 }
 
@@ -136,90 +124,197 @@ export class TroublemakerStrategy extends RoleStrategy {
 
 export class HunterStrategy extends RoleStrategy {
   type = RoleType.HUNTER;
-  priority = 99; // Pre-select mechanism
+  priority = 99; 
   getActionType() { return ActionType.CONDITIONAL_KILL; }
-  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
-    // Just marks the target as the potential victim of retribution
-    // Execution happens in ResolutionEngine if Hunter dies.
-  }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
 }
 
 // --- PHASE 2 STRATEGIES ---
 
 export class WitchStrategy extends RoleStrategy {
   type = RoleType.WITCH;
-  priority = 0; // Potions are fast
-  getActionType() { return ActionType.POISON; } // Default if unspecified
-  
+  priority = 0; 
+  getActionType() { return ActionType.POISON; } 
   createAction(actorId: string, targetId: string, actionType?: ActionType): NightAction {
     return {
       id: crypto.randomUUID(),
       actorId,
       targetId,
-      type: actionType || ActionType.POISON, // Witch can HEAL or POISON
+      type: actionType || ActionType.POISON, 
       priority: 0
     };
   }
-
   execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
     if (actorFlags.isRoleblocked) return;
     if (action.type === ActionType.HEAL) {
       targetFlags.isProtected = true;
     } else if (action.type === ActionType.POISON) {
       targetFlags.isMarkedForDeath = true;
-      targetFlags.isDoomed = true; // Magic poison usually kills (doomed)
+      targetFlags.isDoomed = true; 
     }
   }
 }
 
 export class DireWolfStrategy extends RoleStrategy {
   type = RoleType.DIRE_WOLF;
-  priority = 0; // Setup
+  priority = 0; 
   getActionType() { return ActionType.LINK; }
-  
   canTarget(actor: Player, target: Player): boolean {
-    // Only Night 1 (ResolutionEngine enforces this, strategy just allows creation)
     return super.canTarget(actor, target) && !actor.attributes?.linkedPartnerId;
   }
-
-  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
-     // Sets attribute in ResolutionEngine
-  }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
 }
 
 export class ChangelingStrategy extends RoleStrategy {
   type = RoleType.CHANGELING;
-  priority = 0; // Setup
+  priority = 0; 
   getActionType() { return ActionType.LINK; }
-  
   canTarget(actor: Player, target: Player): boolean {
     return super.canTarget(actor, target) && !actor.attributes?.changelingTargetId;
   }
-
   execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
 }
 
-// --- PASSIVE / INFO ROLES ---
+// --- EXPANSION STRATEGIES ---
 
-export class MinionStrategy extends RoleStrategy {
-  type = RoleType.MINION;
-  priority = 0;
-  getActionType() { return ActionType.INVESTIGATE; }
-  execute() {}
+export class AuraSeerStrategy extends RoleStrategy {
+  type = RoleType.AURA_SEER;
+  priority = 10;
+  getActionType() { return ActionType.CHECK_AURA; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+    if (actorFlags.isRoleblocked) return;
+    // Resolution handled in engine
+  }
 }
 
-export class MasonStrategy extends RoleStrategy {
-  type = RoleType.MASON;
+export class CupidStrategy extends RoleStrategy {
+  type = RoleType.CUPID;
   priority = 0;
-  getActionType() { return ActionType.INVESTIGATE; }
-  execute() {}
+  getActionType() { return ActionType.LINK; }
+  // Cupid targets 2 people, UI needs to handle this, assumes 1st call is target 1
+  canTarget(actor: Player, target: Player): boolean {
+     return super.canTarget(actor, target) || actor.id === target.id; // Can select self
+  }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
 }
 
-export class InsomniacStrategy extends RoleStrategy {
-  type = RoleType.INSOMNIAC;
-  priority = 100;
+export class HuntressStrategy extends RoleStrategy {
+  type = RoleType.HUNTRESS;
+  priority = 5;
+  getActionType() { return ActionType.KILL; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+    if (actorFlags.isRoleblocked) return;
+    targetFlags.isMarkedForDeath = true;
+  }
+}
+
+export class OldWomanStrategy extends RoleStrategy {
+  type = RoleType.OLD_WOMAN;
+  priority = 2; // Before kills
+  getActionType() { return ActionType.BANISH; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+     if (actorFlags.isRoleblocked) return;
+     targetFlags.isBanished = true;
+     targetFlags.isProtected = true; // Cannot be killed
+  }
+}
+
+export class ParanormalInvestigatorStrategy extends RoleStrategy {
+  type = RoleType.PARANORMAL_INVESTIGATOR;
+  priority = 10;
+  getActionType() { return ActionType.CHECK_PARANORMAL; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+     if (actorFlags.isRoleblocked) return;
+     // Resolution handled in engine
+  }
+}
+
+export class RevealerStrategy extends RoleStrategy {
+  type = RoleType.REVEALER;
+  priority = 5;
+  getActionType() { return ActionType.CONDITIONAL_KILL; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
+}
+
+export class SpellcasterStrategy extends RoleStrategy {
+  type = RoleType.SPELLCASTER;
+  priority = 2;
+  getActionType() { return ActionType.SILENCE; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+     if (actorFlags.isRoleblocked) return;
+     targetFlags.isSilenced = true;
+  }
+}
+
+export class ChupacabraStrategy extends RoleStrategy {
+  type = RoleType.CHUPACABRA;
+  priority = 5;
+  getActionType() { return ActionType.CONDITIONAL_KILL; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
+}
+
+export class CultLeaderStrategy extends RoleStrategy {
+  type = RoleType.CULT_LEADER;
+  priority = 3;
+  getActionType() { return ActionType.CONVERT; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+     if (actorFlags.isRoleblocked) return;
+     // Attributes handled in engine
+  }
+}
+
+export class HoodlumStrategy extends RoleStrategy {
+  type = RoleType.HOODLUM;
+  priority = 0;
+  getActionType() { return ActionType.LINK; }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
+}
+
+export class VampireStrategy extends RoleStrategy {
+  type = RoleType.VAMPIRE;
+  priority = 5;
+  getActionType() { return ActionType.POISON; } // Simulating 'bite'
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+     if (actorFlags.isRoleblocked) return;
+     targetFlags.isVampireBit = true;
+  }
+}
+
+export class SorceressStrategy extends RoleStrategy {
+  type = RoleType.SORCERESS;
+  priority = 10;
   getActionType() { return ActionType.INVESTIGATE; }
-  execute() {}
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
+}
+
+export class DoppelgangerStrategy extends RoleStrategy {
+  type = RoleType.DOPPELGANGER;
+  priority = 0;
+  getActionType() { return ActionType.LINK; }
+  canTarget(actor: Player, target: Player): boolean {
+    return super.canTarget(actor, target) && !actor.attributes?.doppelgangerTargetId;
+  }
+  execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {}
+}
+
+export class LoneWolfStrategy extends RoleStrategy {
+    type = RoleType.LONE_WOLF;
+    priority = 5;
+    getActionType() { return ActionType.KILL; }
+    execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+        if (actorFlags.isRoleblocked) return;
+        targetFlags.isMarkedForDeath = true;
+    }
+}
+
+export class WolfCubStrategy extends RoleStrategy {
+    type = RoleType.WOLF_CUB;
+    priority = 5;
+    getActionType() { return ActionType.KILL; }
+    execute(action: NightAction, targetFlags: PlayerFlags, actorFlags: PlayerFlags): void {
+        if (actorFlags.isRoleblocked) return;
+        targetFlags.isMarkedForDeath = true;
+    }
 }
 
 export class VillagerStrategy extends RoleStrategy {
@@ -236,26 +331,50 @@ export class VillagerStrategy extends RoleStrategy {
 
 const strategies: Record<string, RoleStrategy> = {
   [RoleType.WEREWOLF]: new WerewolfStrategy(),
-  [RoleType.WOLF_MAN]: new WolfManStrategy(), // Shares basic killer logic
+  [RoleType.WOLF_MAN]: new WolfManStrategy(),
   [RoleType.SERIAL_KILLER]: new SerialKillerStrategy(),
   [RoleType.BODYGUARD]: new BodyguardStrategy(), 
   [RoleType.SEER]: new SeerStrategy(),
   [RoleType.PRIEST]: new PriestStrategy(),
   [RoleType.APPRENTICE_SEER]: new ApprenticeSeerStrategy(),
   [RoleType.TROUBLEMAKER]: new TroublemakerStrategy(),
-  [RoleType.MINION]: new MinionStrategy(),
-  [RoleType.MASON]: new MasonStrategy(),
-  [RoleType.INSOMNIAC]: new InsomniacStrategy(),
+  [RoleType.MINION]: new VillagerStrategy(), // Passive
+  [RoleType.MASON]: new VillagerStrategy(), // Passive
+  [RoleType.INSOMNIAC]: new VillagerStrategy(), // Passive
   [RoleType.VILLAGER]: new VillagerStrategy(),
   [RoleType.HUNTER]: new HunterStrategy(), 
   [RoleType.MEDIUM]: new VillagerStrategy(),
   [RoleType.JESTER]: new VillagerStrategy(),
   [RoleType.DRUNK]: new VillagerStrategy(),
-  
-  // Phase 2
   [RoleType.WITCH]: new WitchStrategy(),
   [RoleType.DIRE_WOLF]: new DireWolfStrategy(),
   [RoleType.CHANGELING]: new ChangelingStrategy(),
+
+  // Expansion
+  [RoleType.AURA_SEER]: new AuraSeerStrategy(),
+  [RoleType.BEHOLDER]: new VillagerStrategy(), // Passive
+  [RoleType.CUPID]: new CupidStrategy(),
+  [RoleType.DISEASED]: new VillagerStrategy(), // Passive
+  [RoleType.HUNTRESS]: new HuntressStrategy(),
+  [RoleType.OLD_WOMAN]: new OldWomanStrategy(),
+  [RoleType.PACIFIST]: new VillagerStrategy(), // Passive
+  [RoleType.PARANORMAL_INVESTIGATOR]: new ParanormalInvestigatorStrategy(),
+  [RoleType.PRINCE]: new VillagerStrategy(), // Passive
+  [RoleType.REVEALER]: new RevealerStrategy(),
+  [RoleType.SPELLCASTER]: new SpellcasterStrategy(),
+  [RoleType.TOUGH_GUY]: new VillagerStrategy(), // Passive
+  [RoleType.VILLAGER_IDIOT]: new VillagerStrategy(), // Passive
+  [RoleType.LYCAN]: new VillagerStrategy(), // Passive
+  [RoleType.CHUPACABRA]: new ChupacabraStrategy(),
+  [RoleType.CULT_LEADER]: new CultLeaderStrategy(),
+  [RoleType.HOODLUM]: new HoodlumStrategy(),
+  [RoleType.LONE_WOLF]: new LoneWolfStrategy(),
+  [RoleType.TANNER]: new VillagerStrategy(), // Passive
+  [RoleType.VAMPIRE]: new VampireStrategy(),
+  [RoleType.CURSED]: new VillagerStrategy(), // Passive
+  [RoleType.DOPPELGANGER]: new DoppelgangerStrategy(),
+  [RoleType.SORCERESS]: new SorceressStrategy(),
+  [RoleType.WOLF_CUB]: new WolfCubStrategy(),
 };
 
 export const getRoleStrategy = (roleType: RoleType): RoleStrategy => {

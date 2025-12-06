@@ -50,7 +50,7 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
             </span>
           </motion.h1>
           <p className="text-slate-400 font-light tracking-widest text-sm uppercase font-header">
-            Gathering Shadows (จุดรวมพลก่อนค่ำ)
+            Lobby (ห้องรอผู้เล่น)
           </p>
         </div>
 
@@ -61,20 +61,20 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
                 onClick={() => setMode('JOIN')}
                 className={`flex-1 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${mode === 'JOIN' ? 'bg-purple-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
               >
-                  Join Ritual
+                  เข้าร่วมเกม
               </button>
               <button 
                 type="button"
                 onClick={() => setMode('CREATE')}
                 className={`flex-1 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${mode === 'CREATE' ? 'bg-purple-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
               >
-                  Create Coven
+                  สร้างห้องใหม่
               </button>
           </div>
 
           <div className="space-y-2 font-header">
             <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
-              Soul Name (นามวิญญาณ)
+              ชื่อผู้เล่น (Name)
             </label>
             <div className="relative group">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
@@ -82,7 +82,7 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
+                placeholder="กรอกชื่อของคุณ"
                 className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-sans"
               />
             </div>
@@ -97,7 +97,7 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
                     className="space-y-2 overflow-hidden font-header"
                 >
                     <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
-                    Coven Code (รหัสลับ)
+                    รหัสห้อง (Room Code)
                     </label>
                     <div className="relative group">
                     <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
@@ -116,7 +116,7 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
 
           <div className="pt-4 font-header">
             <Button type="submit" disabled={!name || (mode === 'JOIN' && !code)}>
-              {mode === 'JOIN' ? 'Enter The Dead of Night' : 'Summon The Shadows'}
+              {mode === 'JOIN' ? 'เข้าสู่เกม' : 'สร้างห้อง'}
             </Button>
           </div>
         </form>

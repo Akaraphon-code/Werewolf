@@ -6,7 +6,7 @@ import Button from './Button';
 import { Crown, Skull, RefreshCw, Trophy } from 'lucide-react';
 
 interface GameOverScreenProps {
-  winner: 'Good' | 'Evil' | 'Jester' | null;
+  winner: 'Good' | 'Evil' | 'Jester' | 'Cult' | 'Lovers' | 'Tanner' | 'Hoodlum' | 'Lone Wolf' | 'Chupacabra' | null;
   players: Player[];
   onReset: () => void;
   isHost: boolean;
@@ -34,6 +34,12 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ winner, players, onRese
       case 'Good': return { title: 'VICTORY', subtitle: 'ชาวบ้านเป็นฝ่ายชนะ', color: 'text-blue-400', glow: 'shadow-blue-500/50' };
       case 'Evil': return { title: 'DEFEAT', subtitle: 'หมาป่าครองเมือง', color: 'text-red-500', glow: 'shadow-red-500/50' };
       case 'Jester': return { title: 'JESTER WINS', subtitle: 'โดนต้มกันจนเปื่อย', color: 'text-pink-500', glow: 'shadow-pink-500/50' };
+      case 'Cult': return { title: 'CULT VICTORY', subtitle: 'ลัทธิครองโลก', color: 'text-purple-500', glow: 'shadow-purple-500/50' };
+      case 'Lovers': return { title: 'LOVE WINS', subtitle: 'รักแท้ชนะทุกสิ่ง', color: 'text-pink-400', glow: 'shadow-pink-400/50' };
+      case 'Tanner': return { title: 'TANNER WINS', subtitle: 'ความตายคือชัยชนะ', color: 'text-orange-500', glow: 'shadow-orange-500/50' };
+      case 'Hoodlum': return { title: 'HOODLUM WINS', subtitle: 'อันธพาลครองเมือง', color: 'text-yellow-500', glow: 'shadow-yellow-500/50' };
+      case 'Lone Wolf': return { title: 'LONE WOLF', subtitle: 'หมาป่าเดียวดาย', color: 'text-red-600', glow: 'shadow-red-600/50' };
+      case 'Chupacabra': return { title: 'CHUPACABRA', subtitle: 'นักล่าในเงามืด', color: 'text-green-600', glow: 'shadow-green-600/50' };
       default: return { title: 'GAME OVER', subtitle: 'จบเกม', color: 'text-slate-200', glow: 'shadow-slate-500/50' };
     }
   };

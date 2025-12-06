@@ -53,7 +53,7 @@ const RoleCard: React.FC<RoleCardProps> = ({ role }) => {
                {getRoleIcon(role.type)}
             </div>
             
-            {/* Updated Font to Fahkwang (font-header) */}
+            {/* Font Header (Fahkwang) for Name */}
             <h2 className="text-3xl @[300px]:text-4xl font-header font-bold text-white mb-2 tracking-widest neon-text-purple uppercase">
               {role.name}
             </h2>
@@ -83,7 +83,7 @@ const RoleCard: React.FC<RoleCardProps> = ({ role }) => {
 
             <div className="space-y-6 flex-grow">
               
-              {/* Flavor Text / Quote - Updated to use Charmonman (font-horror) and glow */}
+              {/* Flavor Text / Quote - Uses Charmonman (font-horror) */}
               <div className="relative p-4 bg-white/5 rounded-lg border-l-2 border-purple-500 italic">
                  <Quote className="absolute top-2 left-2 w-3 h-3 text-purple-500/50 -scale-x-100" />
                  <p className="text-lg font-horror text-center px-2 leading-relaxed text-purple-200 neon-text-purple">
