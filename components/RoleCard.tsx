@@ -53,11 +53,11 @@ const RoleCard: React.FC<RoleCardProps> = ({ role }) => {
                {getRoleIcon(role.type)}
             </div>
             
-            {/* Container Query: Adjust text size based on card width */}
-            <h2 className="text-3xl @[300px]:text-4xl font-display font-bold text-white mb-2 tracking-widest neon-text-purple uppercase font-thai">
+            {/* Updated Font to Fahkwang (font-header) */}
+            <h2 className="text-3xl @[300px]:text-4xl font-header font-bold text-white mb-2 tracking-widest neon-text-purple uppercase">
               {role.name}
             </h2>
-            <p className="text-xs @[300px]:text-sm text-slate-300 font-light tracking-widest uppercase opacity-80 font-thai">
+            <p className="text-xs @[300px]:text-sm text-slate-300 font-light tracking-widest uppercase opacity-80 font-header">
               แตะเพื่อดูข้อมูล
             </p>
           </div>
@@ -75,41 +75,43 @@ const RoleCard: React.FC<RoleCardProps> = ({ role }) => {
           
           <div className="relative z-10 h-full flex flex-col p-6">
             <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-              <h3 className="text-xl @[300px]:text-2xl font-display font-bold text-purple-400 font-thai">{role.name}</h3>
-              <span className={`px-3 py-1 rounded-full text-[10px] @[300px]:text-xs font-bold uppercase tracking-wider font-thai ${role.alignment === 'Evil' ? 'bg-red-500/20 text-red-400' : role.alignment === 'Neutral' ? 'bg-pink-500/20 text-pink-400' : 'bg-green-500/20 text-green-400'}`}>
+              <h3 className="text-xl @[300px]:text-2xl font-header font-bold text-purple-400">{role.name}</h3>
+              <span className={`px-3 py-1 rounded-full text-[10px] @[300px]:text-xs font-bold uppercase tracking-wider font-header ${role.alignment === 'Evil' ? 'bg-red-500/20 text-red-400' : role.alignment === 'Neutral' ? 'bg-pink-500/20 text-pink-400' : 'bg-green-500/20 text-green-400'}`}>
                 {role.team}
               </span>
             </div>
 
             <div className="space-y-6 flex-grow">
               
-              {/* Flavor Text / Quote */}
-              <div className="relative p-4 bg-white/5 rounded-lg border-l-2 border-purple-500 italic text-purple-200/80">
+              {/* Flavor Text / Quote - Updated to use Charmonman (font-horror) and glow */}
+              <div className="relative p-4 bg-white/5 rounded-lg border-l-2 border-purple-500 italic">
                  <Quote className="absolute top-2 left-2 w-3 h-3 text-purple-500/50 -scale-x-100" />
-                 <p className="text-sm font-thai text-center px-2">"{role.quote}"</p>
+                 <p className="text-lg font-horror text-center px-2 leading-relaxed text-purple-200 neon-text-purple">
+                   "{role.quote}"
+                 </p>
                  <Quote className="absolute bottom-2 right-2 w-3 h-3 text-purple-500/50" />
               </div>
 
               <div>
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 font-thai">เป้าหมาย</h4>
-                <p className="text-sm @[300px]:text-base text-slate-200 leading-relaxed font-light font-thai">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 font-header">เป้าหมาย</h4>
+                <p className="text-sm @[300px]:text-base text-slate-200 leading-relaxed font-light font-header">
                   {role.description}
                 </p>
               </div>
 
               <div className="bg-purple-900/10 p-3 rounded-xl border border-purple-500/20">
-                <h4 className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-1 flex items-center gap-2 font-thai">
+                <h4 className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-1 flex items-center gap-2 font-header">
                   <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
                   ความสามารถ
                 </h4>
-                <p className="text-sm text-purple-100 font-medium font-thai">
+                <p className="text-sm text-purple-100 font-medium font-header">
                   {role.ability}
                 </p>
               </div>
             </div>
 
             <div className="mt-auto pt-4 text-center">
-              <p className="text-[10px] @[300px]:text-xs text-slate-600 uppercase tracking-widest font-thai">
+              <p className="text-[10px] @[300px]:text-xs text-slate-600 uppercase tracking-widest font-header">
                 แตะเพื่อซ่อน
               </p>
             </div>

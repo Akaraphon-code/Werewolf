@@ -1,15 +1,26 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '../context/GameContext';
 import { GamePhase, RoleType } from '../types';
-import { Shield, Skull, Sword, Eye, Moon, Sun, HeartPulse, RefreshCw, Zap, Vote as VoteIcon } from 'lucide-react';
+import { Shield, Skull, Sword, Eye, Moon, Sun, HeartPulse, RefreshCw, Zap, Vote as VoteIcon, LogOut } from 'lucide-react';
 import Button from './Button';
+import GameSetupModal from './GameSetupModal';
 
 const HostDashboard: React.FC = () => {
-  const { state, startGame, advancePhase, togglePlayerLife } = useGame();
+  const { state, startGame, advancePhase, togglePlayerLife, leaveRoom } = useGame();
+  const [isSetupOpen, setIsSetupOpen] = useState(false);
   
   const players = state.hostPlayers && state.hostPlayers.length > 0 ? state.hostPlayers : state.players;
+
+  const handleStartClick = () => {
+    setIsSetupOpen(true);
+  };
+
+  const handleSetupConfirm = (selectedRoles: RoleType[]) => {
+    startGame(selectedRoles);
+    setIsSetupOpen(false);
+  };
 
   const getRoleIcon = (type: RoleType) => {
     switch (type) {
@@ -24,11 +35,11 @@ const HostDashboard: React.FC = () => {
 
   const getPhaseLabel = (phase: GamePhase) => {
     switch (phase) {
-      case GamePhase.LOBBY: return 'ล็อบบี้ (รอผู้เล่น)';
-      case GamePhase.NIGHT: return 'กลางคืน (Night)';
-      case GamePhase.DAY: return 'กลางวัน (Day)';
-      case GamePhase.VOTING: return 'ช่วงโหวต (Voting)';
-      case GamePhase.GAME_OVER: return 'จบเกม (Game Over)';
+      case GamePhase.LOBBY: return 'Gathering Shadows (จุดรวมพลก่อนค่ำ)';
+      case GamePhase.NIGHT: return 'The Dead of Night (รัตติกาลอำมหิต)';
+      case GamePhase.DAY: return 'Daybreak Judgment (รุ่งสางแห่งการพิพากษา)';
+      case GamePhase.VOTING: return 'Execution Hour (ลานประหาร)';
+      case GamePhase.GAME_OVER: return 'The End (บทสรุปโศกนาฏกรรม)';
       default: return phase;
     }
   };
@@ -56,23 +67,33 @@ const HostDashboard: React.FC = () => {
   const maxVotes = Math.max(0, ...Object.values(voteCounts));
 
   return (
-    <div className="flex flex-col h-screen bg-slate-900 text-slate-200 font-thai overflow-hidden">
+    <div className="flex flex-col h-screen bg-slate-900 text-slate-200 font-header overflow-hidden">
       
       {/* Top Bar */}
       <div className="h-16 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-6 shadow-lg z-20">
         <div className="flex items-center gap-4">
           <div className="bg-purple-900/30 text-purple-400 px-3 py-1 rounded-md border border-purple-500/30 text-xs font-mono">
-            ROOM: {state.roomCode}
+            CODE: {state.roomCode}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400">สถานะ:</span>
-            <span className={`text-lg font-bold ${state.phase === GamePhase.NIGHT ? 'text-purple-400' : state.phase === GamePhase.VOTING ? 'text-red-500' : 'text-yellow-400'}`}>
+            <span className="text-sm text-slate-400">Phase:</span>
+            <span className={`text-lg font-bold font-header ${state.phase === GamePhase.NIGHT ? 'text-purple-400' : state.phase === GamePhase.VOTING ? 'text-red-500' : 'text-yellow-400'}`}>
               {getPhaseLabel(state.phase)}
             </span>
           </div>
         </div>
-        <div className="text-xs text-slate-500 uppercase tracking-widest">
-          แผงควบคุมผู้คุมเกม
+        <div className="flex items-center gap-3">
+          <div className="text-xs text-slate-500 uppercase tracking-widest hidden sm:block font-header">
+            Dungeon Master Control
+          </div>
+          <button 
+             onClick={leaveRoom}
+             className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors flex items-center gap-2 text-xs font-bold"
+             title="ออกจากห้อง (Leave Room)"
+          >
+             <LogOut className="w-4 h-4" />
+             <span className="hidden sm:inline">Leave</span>
+          </button>
         </div>
       </div>
 
@@ -95,14 +116,14 @@ const HostDashboard: React.FC = () => {
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
-                      player.role.team.includes('หมาป่า') || player.role.team.includes('ฆาตกร')
+                      player.role.team.includes('Pack') || player.role.team.includes('Evil')
                         ? 'bg-red-500/20 text-red-500'
                         : 'bg-blue-500/20 text-blue-400'
                     }`}>
                       {player.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-bold text-white text-lg">{player.name}</h3>
+                      <h3 className="font-bold text-white text-lg font-header">{player.name}</h3>
                       <div className="flex items-center gap-2 text-xs text-slate-400">
                         {getRoleIcon(player.role.type)}
                         <span>{player.role.name}</span>
@@ -121,16 +142,16 @@ const HostDashboard: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="space-y-2 mt-4 bg-slate-900/50 p-3 rounded-lg text-xs">
+                <div className="space-y-2 mt-4 bg-slate-900/50 p-3 rounded-lg text-xs font-header">
                   <div className="flex justify-between">
-                     <span className="text-slate-500">สถานะชีพ:</span>
+                     <span className="text-slate-500">Soul Status:</span>
                      <span className={player.isAlive ? "text-green-400" : "text-red-500"}>
-                       {player.isAlive ? "มีชีวิต" : "เสียชีวิต"}
+                       {player.isAlive ? "Alive" : "Deceased"}
                      </span>
                   </div>
                   {state.phase === GamePhase.NIGHT && (
                     <div className="flex justify-between">
-                       <span className="text-slate-500">เป้าหมาย:</span>
+                       <span className="text-slate-500">Target:</span>
                        <span className="text-purple-300 font-mono">
                          {getActionTargetName(player.id)}
                        </span>
@@ -145,8 +166,8 @@ const HostDashboard: React.FC = () => {
         {/* Right: Voting Panel (Only visible during Voting) */}
         {state.phase === GamePhase.VOTING && (
           <div className="w-1/3 bg-slate-950/80 border-l border-slate-800 p-6 overflow-auto">
-             <h2 className="text-xl font-display font-bold text-red-500 mb-6 flex items-center gap-2">
-               <VoteIcon /> Live Vote Tally
+             <h2 className="text-xl font-display font-bold text-red-500 mb-6 flex items-center gap-2 font-header">
+               <VoteIcon /> Execution Votes
              </h2>
              <div className="space-y-4">
                 {players.filter(p => p.isAlive).map(player => {
@@ -154,7 +175,7 @@ const HostDashboard: React.FC = () => {
                    const percentage = maxVotes > 0 ? (count / Object.keys(state.votes || {}).length) * 100 : 0;
                    
                    return (
-                     <div key={player.id} className="relative">
+                     <div key={player.id} className="relative font-header">
                         <div className="flex justify-between mb-1 text-sm">
                            <span>{player.name}</span>
                            <span className="font-mono text-red-400">{count} Votes</span>
@@ -171,7 +192,7 @@ const HostDashboard: React.FC = () => {
                 })}
              </div>
              <div className="mt-8 p-4 bg-slate-900 rounded-lg border border-slate-700">
-                <p className="text-xs text-slate-500 uppercase tracking-widest mb-2">Total Votes Cast</p>
+                <p className="text-xs text-slate-500 uppercase tracking-widest mb-2 font-header">Total Condemnations</p>
                 <p className="text-3xl font-mono text-white">{Object.keys(state.votes || {}).length} / {players.filter(p=>p.isAlive).length}</p>
              </div>
           </div>
@@ -184,11 +205,11 @@ const HostDashboard: React.FC = () => {
           
           <Button 
             variant="secondary"
-            onClick={startGame}
+            onClick={handleStartClick}
             disabled={state.phase !== GamePhase.LOBBY && state.phase !== GamePhase.GAME_OVER}
           >
             <div className="flex flex-col items-center leading-none py-1">
-              <span className="text-lg font-thai">สุ่มบทบาท & เริ่มเกม</span>
+              <span className="text-lg font-header">Unleash the Beast (ปลดปล่อยปีศาจ)</span>
             </div>
           </Button>
 
@@ -203,20 +224,30 @@ const HostDashboard: React.FC = () => {
             disabled={state.phase === GamePhase.LOBBY}
           >
              <div className="flex flex-col items-center leading-none py-1">
-              <span className="text-lg font-thai">
+              <span className="text-lg font-header">
                 {state.phase === GamePhase.NIGHT 
-                  ? "ประมวลผล & เช้า" 
+                  ? "Dawn Approaches (เช้า)" 
                   : state.phase === GamePhase.DAY 
-                    ? "เริ่มโหวต (Start Vote)" 
+                    ? "Call for Judgment (เริ่มโหวต)" 
                     : state.phase === GamePhase.VOTING
-                    ? "ปิดโหวต & ประหาร"
-                    : "ถัดไป"}
+                    ? "Execute & Nightfall (ประหาร & ค่ำ)"
+                    : "Next Phase"}
               </span>
             </div>
           </Button>
 
         </div>
       </div>
+      
+      <AnimatePresence>
+        {isSetupOpen && (
+          <GameSetupModal 
+            playerCount={players.length}
+            onConfirm={handleSetupConfirm}
+            onCancel={() => setIsSetupOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

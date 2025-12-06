@@ -21,8 +21,11 @@
   --font-sans: "Inter", sans-serif;
   --font-display: "Cinzel", serif;
   --font-thai: "Kanit", sans-serif;
-  --font-display: "Mitr", sans-serif; /* ใช้สำหรับหัวข้อ/ชื่อบทบาท (ดูแข็งแรง) */
-  --font-body: "Kanit", sans-serif; /* ใช้สำหรับเนื้อหา/กติกา (อ่านง่าย) */
+  --font-header: "Fahkwang", sans-serif; /* New Gothic Header Font */
+  --font-horror: "Charmonman", cursive; /* New Gothic Horror Font */
+  
+  /* Update legacy mappings to use new style where appropriate */
+  --font-body: "Fahkwang", sans-serif; 
 
   /* Animations */
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -35,6 +38,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-background);
   color: #e2e8f0;
+  font-family: var(--font-header);
 }
 
 /* Utility Classes - Glassmorphism */

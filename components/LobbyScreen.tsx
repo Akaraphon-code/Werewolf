@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
@@ -44,36 +45,36 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
             }}
           >
             WEREWOLF
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 neon-text-purple text-4xl md:text-5xl mt-1">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 neon-text-purple text-4xl md:text-5xl mt-1 font-horror">
               EXTREME
             </span>
           </motion.h1>
-          <p className="text-slate-400 font-light tracking-widest text-sm uppercase">
-            คืนหอนหลอน...จ๊าดดด
+          <p className="text-slate-400 font-light tracking-widest text-sm uppercase font-header">
+            Gathering Shadows (จุดรวมพลก่อนค่ำ)
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="glass-panel p-8 rounded-2xl space-y-6">
-          <div className="flex bg-slate-900/50 p-1 rounded-xl mb-6">
+          <div className="flex bg-slate-900/50 p-1 rounded-xl mb-6 font-header">
               <button 
                 type="button"
                 onClick={() => setMode('JOIN')}
                 className={`flex-1 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${mode === 'JOIN' ? 'bg-purple-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
               >
-                  Join Room
+                  Join Ritual
               </button>
               <button 
                 type="button"
                 onClick={() => setMode('CREATE')}
                 className={`flex-1 py-2 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${mode === 'CREATE' ? 'bg-purple-500 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
               >
-                  Create
+                  Create Coven
               </button>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 font-header">
             <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
-              Codename
+              Soul Name (นามวิญญาณ)
             </label>
             <div className="relative group">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
@@ -93,10 +94,10 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="space-y-2 overflow-hidden"
+                    className="space-y-2 overflow-hidden font-header"
                 >
                     <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
-                    Room Access
+                    Coven Code (รหัสลับ)
                     </label>
                     <div className="relative group">
                     <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-purple-400 transition-colors" />
@@ -113,9 +114,9 @@ const LobbyScreen: React.FC<LobbyScreenProps> = ({ onJoin }) => {
             )}
           </AnimatePresence>
 
-          <div className="pt-4">
+          <div className="pt-4 font-header">
             <Button type="submit" disabled={!name || (mode === 'JOIN' && !code)}>
-              {mode === 'JOIN' ? 'Enter The Night' : 'Create Sanctuary'}
+              {mode === 'JOIN' ? 'Enter The Dead of Night' : 'Summon The Shadows'}
             </Button>
           </div>
         </form>

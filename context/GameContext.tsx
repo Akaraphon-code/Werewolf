@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { GameState, Player, GamePhase, ActionType } from '../types';
+import { GameState, Player, GamePhase, ActionType, RoleType } from '../types';
 import { useGameRoom } from '../hooks/useGameRoom';
 
 // --- CONTEXT ---
@@ -8,7 +8,8 @@ interface GameContextType {
   state: GameState;
   createRoom: (name: string) => Promise<string>;
   joinRoom: (code: string, name: string) => Promise<void>;
-  startGame: () => void;
+  leaveRoom: () => void;
+  startGame: (customDeck?: RoleType[]) => void;
   resetGame: () => void; 
   performAction: (targetId: string, actionType?: ActionType) => void;
   castVote: (targetId: string) => void; 
@@ -23,6 +24,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     state, 
     createRoom, 
     joinRoom, 
+    leaveRoom,
     startGame,
     resetGame, 
     performAction,
@@ -45,6 +47,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         state, 
         createRoom: handleCreate, 
         joinRoom: handleJoin, 
+        leaveRoom,
         startGame, 
         resetGame,
         performAction,

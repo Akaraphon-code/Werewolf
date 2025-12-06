@@ -281,6 +281,52 @@ export const resolveNightPhase = (
          actor.privateResult = "คุณยังเป็นแค่ศิษย์ พลังยังไม่ตื่นขึ้น...";
          continue;
     }
+    // --- เพิ่ม LOGIC ใหม่ตรงนี้ ---
+
+    // 1. Minion (สมุนรับใช้): คืนแรก เห็นหมาป่า
+    if (actor.role.type === RoleType.MINION && currentState.currentTurn === 1) {
+         const wolves = Array.from(playersMap.values()).filter(p => 
+             p.role.team === 'ทีมหมาป่า' && p.id !== actor.id
+         );
+         const wolfNames = wolves.map(w => w.name).join(', ');
+         actor.privateResult = wolves.length > 0 
+            ? `นายท่านของคุณคือ: ${wolfNames}`
+            : `คืนนี้คุณไม่พบหมาป่าเลย (คุณอาจจะโดดเดี่ยว)`;
+         continue;
+    }
+
+    // 2. Mason (ภราดรแห่งเมสัน): คืนแรก เห็นเพื่อน
+    if (actor.role.type === RoleType.MASON && currentState.currentTurn === 1) {
+         const otherMasons = Array.from(playersMap.values()).filter(p => 
+             p.role.type === RoleType.MASON && p.id !== actor.id
+         );
+         const masonNames = otherMasons.map(m => m.name).join(', ');
+         actor.privateResult = otherMasons.length > 0
+            ? `คุณพบภราดรคนอื่น: ${masonNames}`
+            : `คุณไม่พบภราดรคนอื่นเลย`;
+         continue;
+    }
+
+    // 3. Insomniac (คนอดนอน): ทุกคืน เช็คคนข้างๆ
+    if (actor.role.type === RoleType.INSOMNIAC) {
+         const neighbors = getNeighbors(Array.from(playersMap.values()), actor.id);
+         // เช็คว่าคนข้างๆ มี Action ในคืนนี้ไหม (ดูจาก actions list)
+         const neighborIds = neighbors.map(n => n.id);
+         const awakeNeighbors = actions.filter(a => neighborIds.includes(a.actorId));
+         
+         actor.privateResult = awakeNeighbors.length > 0
+            ? `คุณสะดุ้งตื่น... และเห็นว่าคนข้างๆ ${awakeNeighbors.length} คน ลุกออกไปทำอะไรบางอย่าง!`
+            : `คืนนี้เงียบสงบ... คนข้างๆ คุณหลับสนิทดี`;
+         continue;
+    }
+
+    // 4. Drunk (ขี้เมา): คืนที่ 3 สร่างเมา
+    if (actor.role.type === RoleType.DRUNK && currentState.currentTurn === 3) {
+        // Logic นี้ขึ้นอยู่กับว่าคุณอยากให้ Drunk เป็นอะไร
+        // แบบง่าย: บอกว่าเป็นชาวบ้านธรรมดา
+        actor.privateResult = "คุณสร่างเมาแล้ว! และพบว่าตัวเองเป็นแค่... ชาวบ้านธรรมดาคนหนึ่ง";
+        // หรือถ้าจะเปลี่ยน Role ก็ทำได้ตรงนี้ครับ
+    }
     
     // --- STANDARD STRATEGIES ---
     const strategy = getRoleStrategy(actor.role.type);

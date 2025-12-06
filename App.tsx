@@ -8,7 +8,7 @@ import VotingScreen from './components/VotingScreen';
 import GameOverScreen from './components/GameOverScreen'; 
 import Button from './components/Button';
 import { GamePhase, RoleType, ActionType } from './types';
-import { ArrowLeft, Skull, Crown, FlaskConical, Link2 } from 'lucide-react';
+import { ArrowLeft, Skull, Crown, FlaskConical, Link2, LogOut } from 'lucide-react';
 import { useGame } from './context/GameContext';
 
 const Particles = () => {
@@ -44,7 +44,7 @@ const Particles = () => {
 };
 
 export default function App() {
-  const { state, createRoom, joinRoom, performAction, resetGame } = useGame();
+  const { state, createRoom, joinRoom, performAction, resetGame, leaveRoom } = useGame();
   
   // Local state for Witch Action Mode (Heal vs Poison)
   const [witchMode, setWitchMode] = useState<ActionType.HEAL | ActionType.POISON>(ActionType.POISON);
@@ -70,13 +70,13 @@ export default function App() {
 
   const getPhaseMessage = () => {
     if (state.phase === GamePhase.GAME_OVER) {
-      if (state.winner === 'Jester') return 'JESTER WINS! (โดนต้มซะเปื่อย)';
-      return state.winner === 'Good' ? 'The Village Survives!' : 'The Werewolves Feast!';
+      if (state.winner === 'Jester') return 'The Madman Reigns! (ชัยชนะของตัวตลก)';
+      return state.winner === 'Good' ? 'Light Prevails! (แสงสว่างขับไล่ความมืด)' : 'Eternal Darkness! (รัตติกาลนิรันดร์)';
     }
-    if (state.phase === GamePhase.LOBBY) return "Waiting for Host to start...";
-    if (state.phase === GamePhase.NIGHT) return "It is Night. Silence falls.";
-    if (state.phase === GamePhase.DAY) return "Day breaks. Discuss!";
-    if (state.phase === GamePhase.VOTING) return "Judgment Time. Vote now.";
+    if (state.phase === GamePhase.LOBBY) return "Awaiting the Coven...";
+    if (state.phase === GamePhase.NIGHT) return "The Dead of Night (รัตติกาลอำมหิต)";
+    if (state.phase === GamePhase.DAY) return "Daybreak Judgment (รุ่งสางแห่งการพิพากษา)";
+    if (state.phase === GamePhase.VOTING) return "Execution Hour (ลานประหาร)";
     return "Loading...";
   };
 
@@ -111,7 +111,7 @@ export default function App() {
 
   // --- PLAYER VIEW ---
   return (
-    <div className="relative min-h-screen w-full bg-background overflow-hidden font-sans text-slate-200">
+    <div className="relative min-h-screen w-full bg-background overflow-hidden font-header text-slate-200">
       <Particles />
       
       <div className="fixed inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none z-0" />
@@ -152,31 +152,32 @@ export default function App() {
                     <Button 
                       variant="ghost"
                       className="!w-auto !py-2 !px-3"
-                      onClick={() => window.location.reload()}
+                      onClick={leaveRoom}
                     >
-                      <ArrowLeft className="w-6 h-6" />
+                      <LogOut className="w-6 h-6" />
+                      <span className="sr-only">Leave Room</span>
                     </Button>
                     <div className="text-right">
-                      <div className="text-xs text-slate-500 uppercase tracking-widest">Room</div>
+                      <div className="text-xs text-slate-500 uppercase tracking-widest font-header">Coven Code</div>
                       <div className="text-purple-400 font-mono font-bold tracking-widest text-xl">{state.roomCode}</div>
                     </div>
                   </div>
 
                   {/* Status Banner */}
                   {!me.isAlive && (
-                    <div className="bg-red-900/50 border border-red-500/50 text-red-200 p-3 rounded-lg text-center mb-4 flex items-center justify-center gap-2">
+                    <div className="bg-red-900/50 border border-red-500/50 text-red-200 p-3 rounded-lg text-center mb-4 flex items-center justify-center gap-2 font-header">
                       <Skull className="w-5 h-5" />
-                      <span className="font-display font-bold">YOU ARE DEAD</span>
+                      <span className="font-bold">YOUR SOUL IS LOST (เสียชีวิต)</span>
                     </div>
                   )}
 
                   {/* Lobby Wait */}
                   {state.phase === GamePhase.LOBBY && (
                       <div className="flex-grow flex flex-col items-center justify-center">
-                          <h2 className="text-2xl font-display mb-4">Lobby</h2>
+                          <h2 className="text-3xl font-display mb-4 font-header text-purple-400">Gathering Shadows</h2>
                           <div className="space-y-2 w-full">
                               {state.players.map(p => (
-                                  <div key={p.id} className="p-3 bg-slate-800/50 rounded-lg flex items-center gap-3 border border-white/5">
+                                  <div key={p.id} className="p-3 bg-slate-800/50 rounded-lg flex items-center gap-3 border border-white/5 font-header">
                                       <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold">
                                           {p.name.charAt(0)}
                                       </div>
@@ -185,7 +186,7 @@ export default function App() {
                                   </div>
                               ))}
                           </div>
-                          <p className="mt-8 text-slate-500 animate-pulse">Waiting for host to start...</p>
+                          <p className="mt-8 text-slate-500 animate-pulse font-header">Waiting for the ritual to begin...</p>
                       </div>
                   )}
 
@@ -204,7 +205,7 @@ export default function App() {
                           
                           {/* Private Results / Messages */}
                           {me.privateResult && state.phase === GamePhase.DAY && (
-                             <div className="mb-4 w-full bg-purple-900/20 border border-purple-500/50 p-3 rounded text-sm text-purple-200 text-center">
+                             <div className="mb-4 w-full bg-purple-900/20 border border-purple-500/50 p-3 rounded text-sm text-purple-200 text-center font-header">
                                 {me.privateResult}
                              </div>
                           )}
@@ -221,14 +222,14 @@ export default function App() {
                                          disabled={!me.attributes?.hasPoisonPotion}
                                          className={`flex-1 py-2 text-xs font-bold uppercase rounded transition-all ${witchMode === ActionType.POISON ? 'bg-red-600 text-white shadow-lg' : 'text-slate-500 hover:text-red-400'} disabled:opacity-30 disabled:cursor-not-allowed`}
                                        >
-                                         Poison (Kill)
+                                         Poison (สังหาร)
                                        </button>
                                        <button 
                                          onClick={() => setWitchMode(ActionType.HEAL)}
                                          disabled={!me.attributes?.hasHealPotion}
                                          className={`flex-1 py-2 text-xs font-bold uppercase rounded transition-all ${witchMode === ActionType.HEAL ? 'bg-green-500 text-white shadow-lg' : 'text-slate-500 hover:text-green-400'} disabled:opacity-30 disabled:cursor-not-allowed`}
                                        >
-                                         Heal (Save)
+                                         Heal (ชุบชีวิต)
                                        </button>
                                     </div>
                                   )}
@@ -240,10 +241,10 @@ export default function App() {
                                          <Link2 className="w-4 h-4 text-blue-400" />
                                       ) : null}
                                       
-                                      <p className="text-center text-sm text-purple-400 font-bold uppercase tracking-wider">
-                                        {me.role.type === RoleType.DIRE_WOLF ? "Select Partner" : 
-                                         me.role.type === RoleType.CHANGELING ? "Select Target" : 
-                                         "Select Target"}
+                                      <p className="text-center text-sm text-purple-400 font-bold uppercase tracking-wider font-header">
+                                        {me.role.type === RoleType.DIRE_WOLF ? "Select Soulbound" : 
+                                         me.role.type === RoleType.CHANGELING ? "Select Host" : 
+                                         "Select Victim/Target"}
                                       </p>
                                   </div>
 
@@ -252,7 +253,7 @@ export default function App() {
                                           <button 
                                               key={p.id}
                                               onClick={() => handleAction(p.id)}
-                                              className="p-3 bg-slate-800 hover:bg-purple-900/50 border border-slate-700 hover:border-purple-500/50 rounded text-sm transition-all font-thai"
+                                              className="p-3 bg-slate-800 hover:bg-purple-900/50 border border-slate-700 hover:border-purple-500/50 rounded text-sm transition-all font-header"
                                           >
                                               {p.name}
                                           </button>
@@ -264,7 +265,7 @@ export default function App() {
                           {/* Messages for Night 1 roles that are done */}
                           {state.phase === GamePhase.NIGHT && me.isAlive && 
                              (me.role.type === RoleType.DIRE_WOLF && me.attributes?.linkedPartnerId) && (
-                             <div className="text-center text-xs text-slate-500 mt-2">Partner Selected. Waiting for night to end.</div>
+                             <div className="text-center text-xs text-slate-500 mt-2 font-header">Soulbound active. The pact is sealed.</div>
                           )}
                         </div>
                       )}
@@ -279,7 +280,7 @@ export default function App() {
                       {/* Footer */}
                       <div className="mt-2 mb-6 space-y-4">
                         <div className="text-center mb-4">
-                          <p className="text-slate-400 text-sm animate-pulse font-display tracking-widest uppercase">
+                          <p className="text-slate-400 text-sm animate-pulse font-header tracking-widest uppercase">
                             {getPhaseMessage()}
                           </p>
                         </div>

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ref, set, onValue, update, get, child, remove } from 'firebase/database';
 import { db, auth } from '../firebase.config';
 import { GameState, Player, GamePhase, RoleType, NightAction, ActionType } from '../types';
@@ -12,6 +12,10 @@ export const useGameRoom = () => {
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
   
+  // Refs to hold latest data for merging without dependency loops
+  const latestPublicPlayers = useRef<Player[]>([]);
+  const latestPrivateMap = useRef<Record<string, any>>({});
+
   const [syncedState, setSyncedState] = useState<GameState>({
     phase: GamePhase.LOBBY,
     players: [],
@@ -93,27 +97,57 @@ export const useGameRoom = () => {
     setIsHost(hostSnapshot.val() === playerId);
   };
 
-  const hostStartGame = async () => {
+  const leaveRoom = () => {
+    setRoomCode(null);
+    setIsHost(false);
+    setSyncedState({
+      phase: GamePhase.LOBBY,
+      players: [],
+      currentTurn: 0,
+      nightActions: [],
+      log: [],
+      winner: null,
+      hostPlayers: [],
+      actions: [],
+      votes: {},
+      executionCount: 1
+    });
+  };
+
+  const hostStartGame = async (customDeck?: RoleType[]) => {
     if (!isHost || !roomCode) return;
     const publicRef = getPublicStateRef(roomCode);
     const snapshot = await get(publicRef);
     const publicData = snapshot.val();
     let players: Player[] = publicData.players || [];
     
-    // Updated Role Distribution with Phase 2
-    const availableRoles = [
-      RoleType.WEREWOLF, RoleType.SEER, RoleType.BODYGUARD, RoleType.SERIAL_KILLER, 
-      RoleType.PRIEST, RoleType.TROUBLEMAKER, RoleType.APPRENTICE_SEER, RoleType.MINION,
-      RoleType.WITCH, RoleType.DIRE_WOLF, RoleType.CHANGELING, RoleType.WOLF_MAN, RoleType.HUNTER
-    ];
-    // Fill rest with Villagers
-    while (availableRoles.length < players.length) availableRoles.push(RoleType.VILLAGER);
+    let deck: RoleType[] = [];
+
+    if (customDeck && customDeck.length > 0) {
+      deck = [...customDeck];
+      while (deck.length < players.length) {
+        deck.push(RoleType.VILLAGER);
+      }
+      if (deck.length > players.length) {
+        deck = deck.slice(0, players.length);
+      }
+    } else {
+      const availableRoles = [
+        RoleType.WEREWOLF, RoleType.SEER, RoleType.BODYGUARD, RoleType.SERIAL_KILLER, 
+        RoleType.PRIEST, RoleType.TROUBLEMAKER, RoleType.APPRENTICE_SEER, RoleType.MINION,
+        RoleType.WITCH, RoleType.DIRE_WOLF, RoleType.CHANGELING, RoleType.WOLF_MAN, RoleType.HUNTER
+      ];
+      deck = [...availableRoles];
+      while (deck.length < players.length) deck.push(RoleType.VILLAGER);
+      deck = deck.slice(0, players.length);
+    }
     
-    const shuffledRoles = availableRoles.sort(() => 0.5 - Math.random()).slice(0, players.length);
+    const shuffledRoles = deck.sort(() => 0.5 - Math.random());
+
     const updates: any = {};
     players = players.map((p, i) => {
       const assignedRole = ROLES[shuffledRoles[i]];
-      // Initialize attributes for specific roles
+      
       const attributes: any = {};
       if (assignedRole.type === RoleType.WITCH) {
         attributes.hasHealPotion = true;
@@ -126,12 +160,9 @@ export const useGameRoom = () => {
         hasUsedAbility: false
       };
       
-      // Drunk logic: Private role is Drunk, but we can store true role elsewhere if needed, 
-      // but for Drunk mechanic usually they ARE drunk until turn 3. 
-      // Simplified: They just know they are Drunk.
-      
       return { ...p, role: ROLES[RoleType.UNKNOWN], isAlive: true, executionCount: 1 };
     });
+
     updates[`rooms/${roomCode}/public/phase`] = GamePhase.NIGHT;
     updates[`rooms/${roomCode}/public/currentTurn`] = 1;
     updates[`rooms/${roomCode}/public/players`] = players;
@@ -170,7 +201,6 @@ export const useGameRoom = () => {
     await update(ref(db), updates);
   };
 
-  // UPDATED: Support for specific ActionType (e.g. Witch HEAL vs POISON)
   const queueAction = async (targetId: string, actionType?: ActionType) => {
     if (!roomCode || !playerId) return;
     const myRoleType = syncedState.players.find(p => p.id === playerId)?.role.type;
@@ -198,14 +228,12 @@ export const useGameRoom = () => {
     if (!currentState) return;
 
     if (currentState.phase === GamePhase.NIGHT) {
-        // --- NIGHT -> DAY ---
         const actionsSnapshot = await get(child(ref(db), `rooms/${roomCode}/actions`));
         const actionsMap = actionsSnapshot.val() || {};
         const nightActions: NightAction[] = Object.values(actionsMap);
         const privateSnapshot = await get(child(ref(db), `rooms/${roomCode}/private`));
         const privateData = privateSnapshot.val() || {};
         
-        // Merge private data (Role + Attributes) into players for resolution
         const fullPlayers: Player[] = (currentState.players || []).map((p: Player) => ({
           ...p,
           role: privateData[p.id]?.role || ROLES[RoleType.UNKNOWN],
@@ -218,24 +246,20 @@ export const useGameRoom = () => {
 
         const updates: any = {};
         
-        // 1. Update Private Data (Persist attributes like potions, role changes)
         updatedPlayers.forEach(p => {
-             // If role changed (Inheritance), sync to private
              updates[`rooms/${roomCode}/private/${p.id}/role`] = p.role;
              updates[`rooms/${roomCode}/private/${p.id}/hasUsedAbility`] = p.hasUsedAbility ?? false;
              updates[`rooms/${roomCode}/private/${p.id}/privateResult`] = p.privateResult || '';
              updates[`rooms/${roomCode}/private/${p.id}/attributes`] = p.attributes || {};
         });
 
-        // 2. Update Public Data
         if (nextPhase === GamePhase.GAME_OVER) {
              const revealedPlayers = updatedPlayers.map(p => ({
                 ...p,
-                role: p.role // Reveal all
+                role: p.role 
              }));
              updates[`rooms/${roomCode}/public/players`] = revealedPlayers;
         } else {
-             // Mask roles again
              updates[`rooms/${roomCode}/public/players`] = updatedPlayers.map(p => ({ 
                ...p, 
                role: ROLES[RoleType.UNKNOWN] 
@@ -251,14 +275,12 @@ export const useGameRoom = () => {
         await update(ref(db), updates);
 
     } else if (currentState.phase === GamePhase.DAY) {
-        // --- DAY -> VOTING ---
         const updates: any = {};
         updates[`rooms/${roomCode}/public/phase`] = GamePhase.VOTING;
         updates[`rooms/${roomCode}/public/log`] = [...(currentState.log || []), "ถึงเวลาโหวตประหาร! (Voting Started)"];
         await update(ref(db), updates);
 
     } else if (currentState.phase === GamePhase.VOTING) {
-        // --- VOTING -> NIGHT ---
         const votesSnapshot = await get(child(ref(db), `rooms/${roomCode}/votes`));
         const votes = votesSnapshot.val() || {};
         const privateSnapshot = await get(child(ref(db), `rooms/${roomCode}/private`));
@@ -274,7 +296,6 @@ export const useGameRoom = () => {
 
         const updates: any = {};
         
-        // Fix: Sync private data for Inheritance (Apprentice/Changeling) that happened during voting
         updatedPlayers.forEach(p => {
              updates[`rooms/${roomCode}/private/${p.id}/role`] = p.role;
              updates[`rooms/${roomCode}/private/${p.id}/hasUsedAbility`] = p.hasUsedAbility ?? false;
@@ -315,9 +336,26 @@ export const useGameRoom = () => {
   useEffect(() => {
     if (!roomCode || !playerId) return;
 
+    const updateHostState = () => {
+        if (!isHost) return;
+        const merged = latestPublicPlayers.current.map(p => {
+             const privateData = latestPrivateMap.current[p.id] || {};
+             return {
+                 ...p,
+                 role: privateData.role || p.role,
+                 hasUsedAbility: privateData.hasUsedAbility,
+                 privateResult: privateData.privateResult,
+                 attributes: privateData.attributes
+             };
+        });
+        setSyncedState(prev => ({ ...prev, hostPlayers: merged }));
+    };
+
     const publicUnsub = onValue(getPublicStateRef(roomCode), (snapshot) => {
       const publicData = snapshot.val();
       if (publicData) {
+        latestPublicPlayers.current = publicData.players || [];
+        
         setSyncedState(prev => {
           if (publicData.phase === GamePhase.GAME_OVER) {
               return { ...prev, ...publicData };
@@ -331,6 +369,9 @@ export const useGameRoom = () => {
           });
           return { ...prev, ...publicData, players: mergedPlayers };
         });
+
+        // Trigger merge for host
+        updateHostState();
       }
     });
 
@@ -366,17 +407,8 @@ export const useGameRoom = () => {
         });
 
         hostRoleUnsub = onValue(child(ref(db), `rooms/${roomCode}/private`), (snapshot) => {
-            const privateMap = snapshot.val() || {};
-            setSyncedState(prev => {
-                const hostPlayers = prev.players.map(p => ({
-                    ...p,
-                    role: privateMap[p.id]?.role || p.role,
-                    hasUsedAbility: privateMap[p.id]?.hasUsedAbility,
-                    privateResult: privateMap[p.id]?.privateResult,
-                    attributes: privateMap[p.id]?.attributes
-                }));
-                return { ...prev, hostPlayers };
-            });
+            latestPrivateMap.current = snapshot.val() || {};
+            updateHostState();
         });
     }
 
@@ -396,6 +428,7 @@ export const useGameRoom = () => {
     state: { ...syncedState, roomCode, playerId, isHost },
     createRoom,
     joinRoom,
+    leaveRoom,
     startGame: hostStartGame,
     resetGame,
     performAction: queueAction,

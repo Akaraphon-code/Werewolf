@@ -30,8 +30,8 @@ const VotingScreen: React.FC = () => {
         >
           <CheckCircle2 className="w-20 h-20" />
         </motion.div>
-        <h2 className="text-2xl font-display font-bold text-white mb-2">Vote Cast</h2>
-        <p className="text-slate-400 font-thai">รอดูกันว่า... ใครจะเป็นผู้โชคร้าย</p>
+        <h2 className="text-2xl font-display font-bold text-white mb-2">Judgment Cast</h2>
+        <p className="text-slate-400 font-header">The spirits await the outcome...</p>
       </div>
     );
   }
@@ -39,8 +39,8 @@ const VotingScreen: React.FC = () => {
   return (
     <div className="flex flex-col h-full w-full max-w-md mx-auto p-4">
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-display font-bold text-red-500 mb-1 neon-text-red">JUDGMENT</h2>
-        <p className="text-slate-400 text-sm font-thai uppercase tracking-wider">โหวตเพื่อกำจัดผู้ต้องสงสัย</p>
+        <h2 className="text-3xl font-display font-bold text-red-500 mb-1 neon-text-red">EXECUTION HOUR</h2>
+        <p className="text-slate-400 text-sm font-header uppercase tracking-wider">Choose who shall perish</p>
       </div>
 
       <div className="flex-grow overflow-y-auto space-y-3 pb-4">
@@ -61,7 +61,7 @@ const VotingScreen: React.FC = () => {
               <User className="w-5 h-5" />
             </div>
             <div className="text-left">
-              <span className={`block font-bold text-lg font-thai ${selectedTargetId === player.id ? 'text-white' : 'text-slate-300'}`}>
+              <span className={`block font-bold text-lg font-header ${selectedTargetId === player.id ? 'text-white' : 'text-slate-300'}`}>
                 {player.name}
               </span>
             </div>
@@ -80,7 +80,7 @@ const VotingScreen: React.FC = () => {
           onClick={handleVote} 
           disabled={!selectedTargetId}
         >
-          ยืนยันการโหวต (Confirm Vote)
+          Condemn (พิพากษา)
         </Button>
       </div>
     </div>
