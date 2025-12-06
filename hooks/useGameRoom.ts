@@ -63,9 +63,7 @@ export const useGameRoom = () => {
         isMarkedForDeath: false, 
         isRevealed: false, 
         isDoomed: false,
-        isBanished: false,
         isSilenced: false,
-        isVampireBit: false,
         isProtectedFromWolvesOnly: false
       }
     };
@@ -102,9 +100,7 @@ export const useGameRoom = () => {
           isMarkedForDeath: false, 
           isRevealed: false, 
           isDoomed: false,
-          isBanished: false,
           isSilenced: false,
-          isVampireBit: false,
           isProtectedFromWolvesOnly: false
         }
       };
@@ -205,9 +201,7 @@ export const useGameRoom = () => {
         isMarkedForDeath: false, 
         isRevealed: false, 
         isDoomed: false,
-        isBanished: false,
         isSilenced: false,
-        isVampireBit: false,
         isProtectedFromWolvesOnly: false
       },
       hasUsedAbility: false,

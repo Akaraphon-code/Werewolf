@@ -196,89 +196,9 @@ export const ROLES: Record<RoleType, Role> = {
     team: 'Team Villager'
   },
 
-  // --- NEW EXPANSION ROLES ---
+  // --- NEW EXPANSION ROLES (Filtered) ---
 
   // Group A: Villager Team
-  [RoleType.AURA_SEER]: {
-    type: RoleType.AURA_SEER,
-    name: 'ผู้หยั่งรู้ออร่า (Aura Seer)',
-    description: 'ตรวจสอบผู้เล่น 1 คน หากเป็น "ชาวบ้าน" หรือ "หมาป่า" จะเห็นผลว่า "Thumb DOWN" แต่ถ้าเป็นบทบาทพิเศษ (ดีหรือร้าย) จะเห็น "Thumb UP"',
-    quote: 'แสงออร่าบอกความจริง',
-    ability: 'ดูออร่า',
-    imageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Good',
-    team: 'Team Villager'
-  },
-  [RoleType.BEHOLDER]: {
-    type: RoleType.BEHOLDER,
-    name: 'ผู้เฝ้ามอง (Beholder)',
-    description: 'ในคืนแรก คุณจะได้รับรู้ชื่อของ "ผู้หยั่งรู้" ตัวจริง',
-    quote: 'ข้าเฝ้ามองท่านอยู่',
-    ability: 'หาผู้หยั่งรู้',
-    imageUrl: 'https://images.unsplash.com/photo-1601934907577-63df74946399?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Good',
-    team: 'Team Villager'
-  },
-  [RoleType.CUPID]: {
-    type: RoleType.CUPID,
-    name: 'คิวปิด (Cupid)',
-    description: 'คืนแรก เลือกผู้เล่น 2 คนให้เป็นคู่รักกัน หากคนหนึ่งตาย อีกคนจะตายตามทันที ถ้าคู่รักอยู่คนละฝั่ง จะกลายเป็นฝ่ายที่ 3',
-    quote: 'ความรักชนะทุกสิ่ง แม้ความตาย',
-    ability: 'แผลงศร',
-    imageUrl: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Good',
-    team: 'Team Villager'
-  },
-  [RoleType.DISEASED]: {
-    type: RoleType.DISEASED,
-    name: 'ผู้ติดโรค (Diseased)',
-    description: 'หากหมาป่าสังหารคุณ ในคืนถัดไปหมาป่าจะไม่สามารถฆ่าใครได้เลย',
-    quote: 'เลือดของข้าเป็นพิษ',
-    ability: 'แพร่เชื้อ',
-    imageUrl: 'https://images.unsplash.com/photo-1584036561566-b93a50208c3c?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Good',
-    team: 'Team Villager'
-  },
-  [RoleType.HUNTRESS]: {
-    type: RoleType.HUNTRESS,
-    name: 'พรานหญิง (Huntress)',
-    description: 'สามารถเลือกสังหารผู้เล่นได้คืนละ 1 คน หรือเลือกไม่ทำอะไรเลย',
-    quote: 'ไม่มีใครหนีรอดสายตาข้า',
-    ability: 'ไล่ล่า',
-    imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Good',
-    team: 'Team Villager'
-  },
-  [RoleType.OLD_WOMAN]: {
-    type: RoleType.OLD_WOMAN,
-    name: 'หญิงแก่ (Old Woman)',
-    description: 'เลือกผู้เล่น 1 คนเพื่อ "ขับไล่" ในวันถัดไป คนที่โดนไล่จะพูดไม่ได้ โหวตไม่ได้ และไม่ถูกฆ่าในวันนั้น',
-    quote: 'ออกไปจากหมู่บ้านซะ!',
-    ability: 'ขับไล่',
-    imageUrl: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Good',
-    team: 'Team Villager'
-  },
-  [RoleType.PACIFIST]: {
-    type: RoleType.PACIFIST,
-    name: 'ผู้รักสงบ (Pacifist)',
-    description: 'คุณไม่สามารถโหวตประหารใครได้เลย',
-    quote: 'ความรุนแรงไม่ใช่ทางออก',
-    ability: 'รักสันติ',
-    imageUrl: 'https://images.unsplash.com/photo-1463171379577-7f9a850f55e6?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Good',
-    team: 'Team Villager'
-  },
-  [RoleType.PARANORMAL_INVESTIGATOR]: {
-    type: RoleType.PARANORMAL_INVESTIGATOR,
-    name: 'คนอวดผี (Paranormal Investigator)',
-    description: 'ตรวจสอบผู้เล่น 1 คน ผลลัพธ์จะเป็น YES หากผู้เล่นคนนั้น หรือเพื่อนบ้านซ้ายขวา เป็นหมาป่า',
-    quote: 'ข้าสัมผัสได้ถึงพลังงานบางอย่าง',
-    ability: 'สัมผัสวิญญาณ',
-    imageUrl: 'https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Good',
-    team: 'Team Villager'
-  },
   [RoleType.PRINCE]: {
     type: RoleType.PRINCE,
     name: 'เจ้าชาย (Prince)',
@@ -342,36 +262,6 @@ export const ROLES: Record<RoleType, Role> = {
   },
 
   // Group B: Self/Neutral
-  [RoleType.CHUPACABRA]: {
-    type: RoleType.CHUPACABRA,
-    name: 'ชูปากาบรัส (Chupacabra)',
-    description: 'เลือกฆ่าคืนละคน ถ้าเป็นหมาป่า หมาป่าตาย ถ้าหมาป่าหมดโลกแล้ว ฆ่าใครก็ได้ ชนะเมื่อเหลือรอดคนสุดท้าย',
-    quote: 'เลือดหมาป่า... มันหอมหวาน',
-    ability: 'ล่าหมาป่า',
-    imageUrl: 'https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Neutral',
-    team: 'Solo'
-  },
-  [RoleType.CULT_LEADER]: {
-    type: RoleType.CULT_LEADER,
-    name: 'ผู้นำลัทธิ (Cult Leader)',
-    description: 'ทุกคืนเลือกชักชวน 1 คนเข้าลัทธิ ชนะเกมเมื่อผู้เล่นที่ยังมีชีวิตทุกคนเป็นสมาชิกลัทธิ',
-    quote: 'จงศรัทธาในข้า',
-    ability: 'เผยแผ่ศาสนา',
-    imageUrl: 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Neutral',
-    team: 'Cult Team'
-  },
-  [RoleType.HOODLUM]: {
-    type: RoleType.HOODLUM,
-    name: 'อันธพาล (Hoodlum)',
-    description: 'คืนแรกเลือกเป้าหมายเท่าจำนวนหมาป่า ชนะถ้าเป้าหมายตายหมดแต่ตัวเองยังมีชีวิตอยู่',
-    quote: 'พวกมันต้องตายก่อนข้า',
-    ability: 'หมายหัว',
-    imageUrl: 'https://images.unsplash.com/photo-1506437942396-649fac10a75b?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Neutral',
-    team: 'Solo'
-  },
   [RoleType.LONE_WOLF]: {
     type: RoleType.LONE_WOLF,
     name: 'หมาป่าเดียวดาย (Lone Wolf)',
@@ -391,16 +281,6 @@ export const ROLES: Record<RoleType, Role> = {
     imageUrl: 'https://images.unsplash.com/photo-1589578527966-8178a3181841?q=80&w=600&auto=format&fit=crop',
     alignment: 'Neutral',
     team: 'Solo'
-  },
-  [RoleType.VAMPIRE]: {
-    type: RoleType.VAMPIRE,
-    name: 'แวมไพร์ (Vampire)',
-    description: 'เลือกเหยื่อ 1 คน เหยื่อจะตายก็ต่อเมื่อวันรุ่งขึ้นเหยื่อถูกโหวตประหาร',
-    quote: 'คมเขี้ยวแห่งรัตติกาล',
-    ability: 'ฝังเขี้ยว',
-    imageUrl: 'https://images.unsplash.com/photo-1620579603525-4c6020c22693?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Evil',
-    team: 'Team Vampire'
   },
 
   // Group C: Hybrid
@@ -426,16 +306,6 @@ export const ROLES: Record<RoleType, Role> = {
   },
 
   // Group D: Wolf Team
-  [RoleType.SORCERESS]: {
-    type: RoleType.SORCERESS,
-    name: 'แม่มดร้าย (Sorceress)',
-    description: 'อยู่ฝ่ายหมาป่า สามารถตรวจสอบผู้เล่นได้ว่าคนนั้นเป็น "ผู้หยั่งรู้" หรือไม่',
-    quote: 'ข้าจะหาตัวเจ้า... ผู้หยั่งรู้',
-    ability: 'ตามล่า',
-    imageUrl: 'https://images.unsplash.com/photo-1596700871626-3f3099d0e41b?q=80&w=600&auto=format&fit=crop',
-    alignment: 'Evil',
-    team: 'Team Werewolf'
-  },
   [RoleType.WOLF_CUB]: {
     type: RoleType.WOLF_CUB,
     name: 'ลูกหมาป่า (Wolf Cub)',

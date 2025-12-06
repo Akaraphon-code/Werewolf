@@ -4,39 +4,12 @@ import { getRoleStrategy, getNeighbors } from './RoleSystem';
 import { ROLES } from '../constants';
 
 // --- WIN CONDITION CHECKER ---
-export const checkWinCondition = (players: Player[], extraState?: { hoodlumTargets?: string[] }): { winner: string | null, reason: string | null } => {
+export const checkWinCondition = (players: Player[]): { winner: string | null, reason: string | null } => {
   const alivePlayers = players.filter(p => p.isAlive);
   
   if (alivePlayers.length === 0) return { winner: null, reason: 'ทุกคนตายหมด! เสมอกัน' };
 
-  // 1. Cult Leader Win
-  const cultLeader = alivePlayers.find(p => p.role.type === RoleType.CULT_LEADER);
-  if (cultLeader) {
-     const allCult = alivePlayers.every(p => p.role.type === RoleType.CULT_LEADER || p.attributes?.isCultMember);
-     if (allCult) return { winner: 'Cult', reason: 'ลัทธิครอบงำหมู่บ้านสำเร็จ! (Cult Leader Wins)' };
-  }
-
-  // 2. Hoodlum Win (Check if all targets dead)
-  // Note: Hoodlum must be alive.
-  const hoodlum = alivePlayers.find(p => p.role.type === RoleType.HOODLUM);
-  if (hoodlum && hoodlum.attributes?.hoodlumTargets) {
-     const targets = hoodlum.attributes.hoodlumTargets;
-     const targetsDead = targets.every(tid => !players.find(p => p.id === tid)?.isAlive);
-     if (targetsDead) return { winner: 'Hoodlum', reason: 'อันธพาลเก็บกวาดเป้าหมายเรียบ! (Hoodlum Wins)' };
-  }
-
-  // 3. Lovers / Third Party Win
-  // If only Lovers remain (and they are on different teams initially or standard Lovers win condition)
-  // Simply: If alive count == 2 and they are lovers.
-  if (alivePlayers.length === 2) {
-      const p1 = alivePlayers[0];
-      const p2 = alivePlayers[1];
-      if (p1.attributes?.loversId === p2.id) {
-          return { winner: 'Lovers', reason: 'ความรักชนะทุกสิ่ง! คู่รักรอดชีวิตเป็นคู่สุดท้าย' };
-      }
-  }
-
-  // 4. Lone Wolf Win
+  // 1. Lone Wolf Win
   const wolves = alivePlayers.filter(p => p.role.alignment === 'Evil' || p.role.team.includes('Werewolf'));
   const villagers = alivePlayers.filter(p => p.role.alignment === 'Good' || p.role.alignment === 'Neutral');
   
@@ -45,13 +18,7 @@ export const checkWinCondition = (players: Player[], extraState?: { hoodlumTarge
       return { winner: 'Lone Wolf', reason: 'หมาป่าเดียวดายยืนหยัดเป็นคนสุดท้าย!' };
   }
 
-  // 5. Chupacabra Win
-  const chupacabra = alivePlayers.find(p => p.role.type === RoleType.CHUPACABRA);
-  if (alivePlayers.length === 1 && chupacabra) {
-      return { winner: 'Chupacabra', reason: 'ชูปากาบรัสสังหารทุกคน!' };
-  }
-
-  // 6. Standard Conditions
+  // 2. Standard Conditions
   if (wolves.length >= villagers.length && wolves.length > 0) {
     return { winner: 'Evil', reason: 'หมาป่าครองเมือง! (จำนวนหมาป่ามากกว่าหรือเท่ากับชาวบ้าน)' };
   }
@@ -155,12 +122,7 @@ export const resolveVotingPhase = (
             return;
         }
 
-        // 2. Vampire Bite Check (Delayed Death)
-        // Implemented: If vampire selected victim, victim dies ONLY if voted.
-        // Actually standard voting kills anyway. Vampire skill says "Victim dies ONLY if voted".
-        // This implies they die normally if voted. No special logic needed unless mechanism protects them otherwise.
-        
-        // 3. Tanner Check
+        // 2. Tanner Check
         if (p.role.type === RoleType.TANNER) {
             p.isAlive = false;
             executedPlayers.push(p);
@@ -187,16 +149,17 @@ export const resolveVotingPhase = (
     events.push(`ไม่มีใครโหวต...`);
   }
 
-  // Handle Lovers Death Loop (Day)
+  // Handle Secondary Deaths (Dire Wolf)
   let deathLoop = true;
   while(deathLoop) {
       deathLoop = false;
       const currentlyDeadIds = executedPlayers.map(p => p.id);
       nextPlayers.forEach(p => {
-          if (p.isAlive && p.attributes?.loversId && currentlyDeadIds.includes(p.attributes.loversId)) {
+          // Dire Wolf check
+          if (p.isAlive && p.role.type === RoleType.DIRE_WOLF && p.attributes?.linkedPartnerId && currentlyDeadIds.includes(p.attributes.linkedPartnerId)) {
                p.isAlive = false;
                executedPlayers.push(p);
-               events.push(`${p.name} ตรอมใจตายตามคู่รัก...`);
+               events.push(`${p.name} ตายตามคู่หูที่ผูกวิญญาณไว้ (Dire Wolf)...`);
                deathLoop = true;
           }
       });
@@ -237,7 +200,7 @@ export const resolveNightPhase = (
         ...p, 
         flags: { 
           isProtected: false, isRoleblocked: false, isMarkedForDeath: false, isRevealed: false, isDoomed: false,
-          isBanished: false, isSilenced: false, isVampireBit: false, isProtectedFromWolvesOnly: false
+          isSilenced: false, isProtectedFromWolvesOnly: false
         },
         privateResult: ''
       }
@@ -247,7 +210,6 @@ export const resolveNightPhase = (
   const actions = [...currentState.nightActions].sort((a, b) => a.priority - b.priority);
   
   let nextExecutionCount = 1;
-  let wolvesDisabledNextTurn = false;
   let wolfExtraKillsNextTurn = 0;
   
   // 1. ACTION PROCESSING
@@ -256,98 +218,24 @@ export const resolveNightPhase = (
     const target = playersMap.get(action.targetId);
     if (!actor || !target || !actor.isAlive) continue;
 
-    // A. BLOCKERS (Spellcaster/Old Woman technically day effects, but if block roles existed, handle here)
-    // Assuming Roleblocker role exists? (Not in list, but Spellcaster silences NEXT day). 
-    
-    // B. SPECIAL SETUP (Night 1)
-    if (action.type === ActionType.LINK && actor.role.type === RoleType.CUPID) {
-        // Cupid sends targetId (1st lover). Need UI to send additionalTargetId or 2 actions.
-        // Assuming simplistic implementation: Cupid links Actor + Target if self not excluded, 
-        // OR better: In this engine, let's assume Cupid links Target and 'additionalTargetId' if provided.
-        // If simplistic: Cupid selects Target. Who is the second?
-        // Let's rely on attribute logic:
-        // Cupid Logic: Target 1 is `target`. Target 2?
-        // Let's skip complex UI for now and assume Cupid links THEMSELVES to Target if single selection.
-        if (!actor.hasUsedAbility) {
-            actor.hasUsedAbility = true;
-            actor.attributes = { ...actor.attributes, loversId: target.id };
-            target.attributes = { ...target.attributes, loversId: actor.id };
-            actor.privateResult = `คุณผูกด้ายแดงกับ ${target.name} แล้ว`;
-            target.privateResult = `คุณรู้สึกถึงความรัก... คุณคือคู่รักของ ${actor.name}`;
-        }
-        continue;
-    }
-    
-    if (action.type === ActionType.LINK && actor.role.type === RoleType.HOODLUM) {
-        if (!actor.attributes) actor.attributes = { hoodlumTargets: [] };
-        if (!actor.attributes.hoodlumTargets?.includes(target.id)) {
-            actor.attributes.hoodlumTargets = [...(actor.attributes.hoodlumTargets || []), target.id];
-            actor.privateResult = `คุณหมายหัว ${target.name}`;
-        }
-        continue;
-    }
-
-    // C. INFORMATION ROLES
-    if (action.type === ActionType.CHECK_AURA && actor.role.type === RoleType.AURA_SEER) {
-         const isSpecial = target.role.type !== RoleType.VILLAGER && target.role.type !== RoleType.WEREWOLF;
-         actor.privateResult = isSpecial ? `${target.name}: THUMB UP (Special)` : `${target.name}: THUMB DOWN (Normal)`;
-         continue;
-    }
-
-    if (action.type === ActionType.CHECK_PARANORMAL && actor.role.type === RoleType.PARANORMAL_INVESTIGATOR) {
-         const neighbors = getNeighbors(Array.from(playersMap.values()), target.id);
-         const subjects = [target, ...neighbors];
-         const hasWolf = subjects.some(s => s.role.team === 'Team Werewolf' || s.role.alignment === 'Evil'); // Simplified
-         actor.privateResult = hasWolf ? "YES (พบกลิ่นอายหมาป่า)" : "NO (ไม่พบสิ่งผิดปกติ)";
-         continue;
-    }
-    
-    if (action.type === ActionType.INVESTIGATE && actor.role.type === RoleType.SORCERESS) {
-         const isSeer = target.role.type === RoleType.SEER;
-         actor.privateResult = isSeer ? `เจอแล้ว! ${target.name} คือผู้หยั่งรู้!` : `${target.name} ไม่ใช่ผู้หยั่งรู้`;
-         continue;
-    }
-
-    // D. CONVERSION
-    if (action.type === ActionType.CONVERT && actor.role.type === RoleType.CULT_LEADER) {
-        // Can convert? 
-        target.attributes = { ...target.attributes, isCultMember: true };
-        actor.privateResult = `${target.name} ได้เข้าร่วมลัทธิแล้ว`;
-        target.privateResult = `คุณถูกชักชวนเข้าลัทธิ! ตอนนี้คุณเป็นสาวกของ ${actor.name}`;
-        continue;
-    }
-
-    // E. STATUS EFFECTS
+    // A. STATUS EFFECTS
     if (action.type === ActionType.SILENCE && actor.role.type === RoleType.SPELLCASTER) {
         target.flags.isSilenced = true;
         actor.privateResult = `คุณร่ายเวทใบ้ใส่ ${target.name}`;
         continue;
     }
     
-    if (action.type === ActionType.BANISH && actor.role.type === RoleType.OLD_WOMAN) {
-        target.flags.isBanished = true;
-        // Banished cannot be killed tonight? Prompt says "Not killed during the DAY". 
-        // Assuming effect applies to Day Phase.
-        actor.privateResult = `คุณขับไล่ ${target.name}`;
-        continue;
-    }
-
-    // F. KILLING ROLES (Handle Immunities)
+    // B. KILLING ROLES (Handle Immunities)
     if (action.type === ActionType.KILL) {
-        // Diseased Check: If wolves kill diseased, set global flag for NEXT turn.
-        // Wait, disabling happens NEXT turn.
+        
         // Protection Check
         if (target.flags.isProtected) {
              actor.privateResult = `การโจมตี ${target.name} ล้มเหลว!`;
              continue;
         }
         
-        // Diseased Logic (Wolf Attack)
+        // Wolf Attack Logic
         if (actor.role.type === RoleType.WEREWOLF || actor.role.type === RoleType.WOLF_MAN || actor.role.type === RoleType.WOLF_CUB) {
-             if (currentState.wolvesDisabled) {
-                 actor.privateResult = "ฝูงหมาป่าติดโรค! ไม่สามารถล่าได้ในคืนนี้";
-                 continue;
-             }
              
              // Cursed Logic
              if (target.role.type === RoleType.CURSED) {
@@ -364,22 +252,10 @@ export const resolveNightPhase = (
                  target.privateResult = `คุณถูกกัด! แผลฉกรรจ์มาก... คุณรู้ตัวว่าจะไม่รอดในคืนพรุ่งนี้`;
                  continue;
              }
-             
-             // Diseased Trigger (If kill succeeds)
-             if (target.role.type === RoleType.DISEASED) {
-                 wolvesDisabledNextTurn = true;
-             }
         }
         
         // Mark for death
         target.flags.isMarkedForDeath = true;
-        
-        // Wolf Cub Trigger
-        if (target.role.type === RoleType.WOLF_CUB) {
-             // If Wolf Cub dies (by Hunter/Witch/Chupacabra), wolves get +kills.
-             // Actually, Wolf Cub creates benefit if HE dies.
-             // This logic block handles ATTACKING.
-        }
     }
     
     // Standard Strategy Execute
@@ -387,12 +263,8 @@ export const resolveNightPhase = (
     strategy.execute(action, target.flags, actor.flags);
   }
 
-  // 2. PASSIVE INFORMATION (Beholder, etc)
+  // 2. PASSIVE INFORMATION
   playersMap.forEach(p => {
-      if (p.role.type === RoleType.BEHOLDER && currentState.currentTurn === 1) {
-          const seer = Array.from(playersMap.values()).find(x => x.role.type === RoleType.SEER);
-          p.privateResult = seer ? `ผู้หยั่งรู้ตัวจริงคือ: ${seer.name}` : `ไม่พบผู้หยั่งรู้ในหมู่บ้าน`;
-      }
       // Tough Guy Delayed Death Check
       if (p.attributes?.toughGuyDeathTurn === currentState.currentTurn) {
           p.flags.isMarkedForDeath = true;
@@ -431,22 +303,17 @@ export const resolveNightPhase = (
       }
   });
 
-  // Chain Reactions (Lovers, Hunter, Dire Wolf)
+  // Chain Reactions (Dire Wolf)
   while (newDeathFound) {
       newDeathFound = false;
       playersMap.forEach(actor => {
            if (!actor.isAlive && !deadThisTurn.has(actor.id)) return; // Already processed dead
            if (actor.isAlive) {
-               // Lovers Check
-               if (actor.attributes?.loversId && deadThisTurn.has(actor.attributes.loversId)) {
-                   if(markDead(actor, "ตรอมใจตายตามคู่รัก")) newDeathFound = true;
-               }
                // Dire Wolf Check
                if (actor.role.type === RoleType.DIRE_WOLF && actor.attributes?.linkedPartnerId && deadThisTurn.has(actor.attributes.linkedPartnerId)) {
                    if(markDead(actor, "ตายตามคู่หูที่ผูกวิญญาณไว้")) newDeathFound = true;
                }
            }
-           // Revealer Check (If target wasn't wolf, Revealer dies. Logic usually in Strategy/Action processing, but simpler here if action stored target)
       });
   }
 
@@ -472,7 +339,7 @@ export const resolveNightPhase = (
     events,
     nextPhase: GamePhase.DAY,
     nextExecutionCount,
-    wolvesDisabled: wolvesDisabledNextTurn,
+    wolvesDisabled: false,
     wolfExtraKills: wolfExtraKillsNextTurn
   };
 };

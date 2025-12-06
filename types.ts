@@ -24,17 +24,9 @@ export enum RoleType {
   DIRE_WOLF = 'Dire Wolf',
   CHANGELING = 'Changeling',
 
-  // --- NEW EXPANSION ROLES ---
+  // --- NEW EXPANSION ROLES (Filtered) ---
   
   // Group A: Villager Team
-  AURA_SEER = 'Aura Seer',
-  BEHOLDER = 'Beholder',
-  CUPID = 'Cupid',
-  DISEASED = 'Diseased',
-  HUNTRESS = 'Huntress',
-  OLD_WOMAN = 'Old Woman',
-  PACIFIST = 'Pacifist',
-  PARANORMAL_INVESTIGATOR = 'Paranormal Investigator',
   PRINCE = 'Prince',
   REVEALER = 'Revealer',
   SPELLCASTER = 'Spellcaster',
@@ -43,19 +35,14 @@ export enum RoleType {
   LYCAN = 'Lycan',
 
   // Group B: Self/Neutral
-  CHUPACABRA = 'Chupacabra',
-  CULT_LEADER = 'Cult Leader',
-  HOODLUM = 'Hoodlum',
   LONE_WOLF = 'Lone Wolf',
   TANNER = 'Tanner',
-  VAMPIRE = 'Vampire',
 
   // Group C: Hybrid
   CURSED = 'Cursed',
   DOPPELGANGER = 'Doppelganger',
 
   // Group D: Wolf Team
-  SORCERESS = 'Sorceress',
   WOLF_CUB = 'Wolf Cub',
   
   UNKNOWN = 'Unknown'
@@ -74,20 +61,16 @@ export enum ActionType {
   PROTECT = 'PROTECT',
   INVESTIGATE = 'INVESTIGATE',
   BLOCK = 'BLOCK',
-  CONDITIONAL_KILL = 'CONDITIONAL_KILL', // Priest, Hunter
+  CONDITIONAL_KILL = 'CONDITIONAL_KILL', // Priest, Hunter, Revealer
   TROUBLEMAKE = 'TROUBLEMAKE', // Troublemaker
   
   // Phase 2 Actions
   HEAL = 'HEAL',
   POISON = 'POISON',
-  LINK = 'LINK', // Dire Wolf, Changeling, Cupid
+  LINK = 'LINK', // Dire Wolf, Changeling
   
   // Expansion Actions
-  BANISH = 'BANISH', // Old Woman
   SILENCE = 'SILENCE', // Spellcaster
-  CONVERT = 'CONVERT', // Cult Leader
-  CHECK_AURA = 'CHECK_AURA', // Aura Seer
-  CHECK_PARANORMAL = 'CHECK_PARANORMAL', // Paranormal Investigator
   
   NO_ACTION = 'NO_ACTION'
 }
@@ -98,7 +81,6 @@ export interface NightAction {
   targetId: string;
   type: ActionType;
   priority: number;
-  additionalTargetId?: string; // For Cupid (2 targets)
 }
 
 export interface Vote {
@@ -114,9 +96,7 @@ export interface PlayerFlags {
   isRevealed: boolean;
   
   // Expansion Flags
-  isBanished: boolean; // Old Woman effect
   isSilenced: boolean; // Spellcaster effect
-  isVampireBit: boolean; // Vampire effect
   isProtectedFromWolvesOnly: boolean; // Specific protection
 }
 
@@ -140,12 +120,8 @@ export interface PlayerAttributes {
   retributionTargetId?: string; // Hunter
   
   // Expansion Attributes
-  loversId?: string; // Cupid Link
-  isCultMember?: boolean; // Cult Leader
-  hoodlumTargets?: string[]; // Hoodlum
   toughGuyDeathTurn?: number; // Tough Guy delayed death
   doppelgangerTargetId?: string; // Doppelganger
-  isDiseased?: boolean; // Trigger for disabling wolves
 }
 
 export interface Player {
@@ -174,9 +150,9 @@ export interface GameState {
   executionCount: number; 
   nightActions: NightAction[];
   log: string[]; 
-  winner?: 'Good' | 'Evil' | 'Jester' | 'Cult' | 'Lovers' | 'Tanner' | 'Hoodlum' | 'Lone Wolf' | 'Chupacabra' | null;
+  winner?: 'Good' | 'Evil' | 'Jester' | 'Tanner' | 'Lone Wolf' | null;
   
   // Global Effects
-  wolvesDisabled?: boolean; // Diseased effect
+  wolvesDisabled?: boolean; // (Legacy flag, kept if needed later)
   wolfExtraKills?: number; // Wolf Cub effect
 }
