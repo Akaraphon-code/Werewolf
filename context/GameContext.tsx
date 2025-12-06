@@ -15,6 +15,7 @@ interface GameContextType {
   castVote: (targetId: string) => void; 
   advancePhase: () => void;
   togglePlayerLife: (playerId: string, isAlive: boolean) => void;
+  updateTimer: (seconds: number | null) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -30,7 +31,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     performAction,
     castVote, 
     advancePhase,
-    togglePlayerLife 
+    togglePlayerLife,
+    updateTimer
   } = useGameRoom();
 
   const handleCreate = async (name: string) => {
@@ -53,7 +55,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         performAction,
         castVote,
         advancePhase,
-        togglePlayerLife
+        togglePlayerLife,
+        updateTimer
       }}
     >
       {children}

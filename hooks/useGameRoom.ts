@@ -26,7 +26,8 @@ export const useGameRoom = () => {
     hostPlayers: [],
     actions: [],
     votes: {},
-    executionCount: 1
+    executionCount: 1,
+    timerEnd: undefined
   });
 
   useEffect(() => {
@@ -216,7 +217,8 @@ export const useGameRoom = () => {
       currentTurn: 0,
       log: ["New game started. Waiting for host..."],
       winner: null,
-      executionCount: 1
+      executionCount: 1,
+      timerEnd: null
     };
     updates[`rooms/${roomCode}/private`] = null; 
     updates[`rooms/${roomCode}/actions`] = null;
@@ -250,6 +252,11 @@ export const useGameRoom = () => {
     const publicSnapshot = await get(getPublicStateRef(roomCode));
     const currentState = publicSnapshot.val();
     if (!currentState) return;
+
+    // Reset Timer on phase change
+    const commonUpdates: any = {};
+    commonUpdates[`rooms/${roomCode}/public/timerEnd`] = null;
+    await update(ref(db), commonUpdates);
 
     if (currentState.phase === GamePhase.NIGHT) {
         const actionsSnapshot = await get(child(ref(db), `rooms/${roomCode}/actions`));
@@ -357,6 +364,15 @@ export const useGameRoom = () => {
     await update(ref(db), { [`rooms/${roomCode}/public/players`]: updatedPlayers });
   };
 
+  const updateTimer = async (seconds: number | null) => {
+    if (!isHost || !roomCode) return;
+    let timerEnd = null;
+    if (seconds !== null) {
+      timerEnd = Date.now() + (seconds * 1000);
+    }
+    await update(ref(db), { [`rooms/${roomCode}/public/timerEnd`]: timerEnd });
+  };
+
   useEffect(() => {
     if (!roomCode || !playerId) return;
 
@@ -458,6 +474,7 @@ export const useGameRoom = () => {
     performAction: queueAction,
     castVote,
     advancePhase: hostAdvancePhase,
-    togglePlayerLife
+    togglePlayerLife,
+    updateTimer
   };
 };

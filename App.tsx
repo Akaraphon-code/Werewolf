@@ -8,8 +8,9 @@ import VotingScreen from './components/VotingScreen';
 import GameOverScreen from './components/GameOverScreen'; 
 import Button from './components/Button';
 import { GamePhase, RoleType, ActionType } from './types';
-import { ArrowLeft, Skull, Crown, FlaskConical, Link2, LogOut, Target, Check, Zap } from 'lucide-react';
+import { ArrowLeft, Skull, Crown, FlaskConical, Link2, LogOut, Target, Check, Zap, Volume2, VolumeX } from 'lucide-react';
 import { useGame } from './context/GameContext';
+import { useSound } from './context/SoundContext';
 
 const Particles = () => {
   return (
@@ -45,6 +46,7 @@ const Particles = () => {
 
 export default function App() {
   const { state, createRoom, joinRoom, performAction, resetGame, leaveRoom } = useGame();
+  const { playBGM, playSFX, toggleMute, isMuted } = useSound();
   
   // Local state for Witch Action Mode (Heal vs Poison)
   const [witchMode, setWitchMode] = useState<ActionType.HEAL | ActionType.POISON>(ActionType.POISON);
@@ -54,6 +56,20 @@ export default function App() {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const me = state.players.find(p => p.id === state.playerId);
+
+  // Sound Integration: BGM Phase Management
+  useEffect(() => {
+    if (state.phase) {
+      playBGM(state.phase);
+    }
+  }, [state.phase, playBGM]);
+
+  // Sound Integration: Game Over SFX
+  useEffect(() => {
+    if (state.phase === GamePhase.GAME_OVER) {
+      playSFX('WIN');
+    }
+  }, [state.phase, playSFX]);
 
   // Reset selection when phase changes or witch mode changes
   useEffect(() => {
@@ -71,6 +87,7 @@ export default function App() {
   }, [witchMode, me?.role.type]);
 
   const handleJoinGame = async (name: string, code: string) => {
+    playSFX('CLICK');
     if (code === "NEW") {
        await createRoom(name);
     } else {
@@ -79,6 +96,7 @@ export default function App() {
   };
 
   const handleAction = (targetId: string) => {
+      playSFX('CLICK');
       // 1. Update Local Visual State immediately
       setLocalSelection(targetId);
 
@@ -156,6 +174,14 @@ export default function App() {
       <Particles />
       
       <div className="fixed inset-0 bg-gradient-to-b from-transparent via-background/80 to-background pointer-events-none z-0" />
+      
+      {/* Global Mute Button */}
+      <button 
+        onClick={toggleMute}
+        className="fixed top-4 right-4 z-50 p-3 rounded-full bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-700 backdrop-blur-md shadow-lg border border-slate-700 transition-all"
+      >
+        {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+      </button>
 
       <AnimatePresence mode="wait">
         {!state.roomCode && (
@@ -189,11 +215,14 @@ export default function App() {
             ) : (
                 <div className="w-full max-w-md mx-auto h-full flex flex-col">
                   {/* Header */}
-                  <div className="flex justify-between items-center mb-4 pt-4">
+                  <div className="flex justify-between items-center mb-4 pt-4 pr-12">
                     <Button 
                       variant="ghost"
                       className="!w-auto !py-2 !px-3"
-                      onClick={leaveRoom}
+                      onClick={() => {
+                        playSFX('CLICK');
+                        leaveRoom();
+                      }}
                     >
                       <LogOut className="w-6 h-6" />
                       <span className="sr-only">Leave Room</span>
@@ -289,7 +318,10 @@ export default function App() {
                                         {me.role.type === RoleType.WITCH && (
                                           <div className="flex gap-3 mb-4 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
                                             <button 
-                                              onClick={() => setWitchMode(ActionType.POISON)}
+                                              onClick={() => {
+                                                playSFX('CLICK');
+                                                setWitchMode(ActionType.POISON);
+                                              }}
                                               disabled={!me.attributes?.hasPoisonPotion}
                                               className={`flex-1 py-3 text-xs font-bold uppercase rounded-lg transition-all flex flex-col items-center gap-1 ${
                                                 witchMode === ActionType.POISON 
@@ -301,7 +333,10 @@ export default function App() {
                                               Poison (ฆ่า)
                                             </button>
                                             <button 
-                                              onClick={() => setWitchMode(ActionType.HEAL)}
+                                              onClick={() => {
+                                                playSFX('CLICK');
+                                                setWitchMode(ActionType.HEAL);
+                                              }}
                                               disabled={!me.attributes?.hasHealPotion}
                                               className={`flex-1 py-3 text-xs font-bold uppercase rounded-lg transition-all flex flex-col items-center gap-1 ${
                                                 witchMode === ActionType.HEAL 

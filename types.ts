@@ -151,6 +151,7 @@ export interface GameState {
   nightActions: NightAction[];
   log: string[]; 
   winner?: 'Good' | 'Evil' | 'Jester' | 'Tanner' | 'Lone Wolf' | null;
+  timerEnd?: number; // Timestamp (ms) when timer ends. Null if no timer.
   
   // Global Effects
   wolvesDisabled?: boolean; // (Legacy flag, kept if needed later)

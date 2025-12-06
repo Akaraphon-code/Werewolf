@@ -207,6 +207,7 @@ export const resolveNightPhase = (
     ])
   );
 
+  // CRITICAL: SORT ACTIONS BY PRIORITY (Lower = Earlier)
   const actions = [...currentState.nightActions].sort((a, b) => a.priority - b.priority);
   
   let nextExecutionCount = 1;
