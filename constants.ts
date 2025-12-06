@@ -10,7 +10,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เลือกเหยื่อเพื่อสังหารในตอนกลางคืน ต้องแฝงตัวให้เนียนที่สุดในตอนกลางวัน',
     quote: 'คืนนี้... ใครจะเป็นรายต่อไป?',
     ability: 'สังหารเหยื่อ',
-    imageUrl: 'https://img5.pic.in.th/file/secure-sv1/Gemini_Generated_Image_1hb9tx1hb9tx1hb9.png', 
+    imageUrl: 'https://i.postimg.cc/3wr3gxw4/hmap-a.png', 
     alignment: 'Evil',
     team: 'Team Werewolf'
   },
@@ -20,7 +20,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'ไม่มีพลังพิเศษ สิ่งเดียวที่มีคือไหวพริบในการจับผิดและโหวตคนร้าย',
     quote: 'เราต้องช่วยกันปกป้องหมู่บ้านนี้',
     ability: 'โหวตจับผิด',
-    imageUrl: 'https://images.unsplash.com/photo-1595231712325-9fdec6f6d9a3?q=80&w=600&auto=format&fit=crop', 
+    imageUrl: 'https://i.postimg.cc/rF7ZLn4b/ชาวบ_าน.png', 
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -30,7 +30,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'สามารถดูบทบาทของผู้เล่นอื่นได้คืนละ 1 คน ว่าเป็นฝ่ายดีหรือฝ่ายร้าย',
     quote: 'ความจริงมีเพียงหนึ่งเดียว',
     ability: 'ส่องดูบทบาท',
-    imageUrl: 'https://images.unsplash.com/photo-1620024870296-4c19075ee223?q=80&w=600&auto=format&fit=crop', 
+    imageUrl: 'https://i.postimg.cc/hjCMZpgr/ผ_หย_งร_(seer).png', 
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -40,7 +40,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เลือกปกป้องผู้เล่น 1 คนในตอนกลางคืน ให้รอดพ้นจากการถูกฆ่า (ห้ามซ้ำคนเดิม)',
     quote: 'ข้าจะปกป้องเจ้าเอง',
     ability: 'คุ้มกัน',
-    imageUrl: 'https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?q=80&w=600&auto=format&fit=crop', 
+    imageUrl: 'https://i.postimg.cc/pXmc4bmc/บอด_การ_ด.png', 
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -50,7 +50,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'หากคุณตาย คุณสามารถเลือกยิงผู้เล่นอื่นให้ตายตกไปตามกันได้ 1 คน',
     quote: 'ถ้าข้าตาย... เจ้าก็ต้องตายด้วย',
     ability: 'ยิงสวนก่อนตาย',
-    imageUrl: 'https://images.unsplash.com/photo-1559419610-1f3a28c3875e?q=80&w=600&auto=format&fit=crop', 
+    imageUrl: 'https://i.postimg.cc/rmhgZQct/นายพราน.png', 
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -60,7 +60,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'สามารถสื่อสารกับคนตาย หรือรู้บทบาทของคนที่ตายไปแล้ว',
     quote: 'เสียงกระซิบจากความตาย...',
     ability: 'สื่อสารวิญญาณ',
-    imageUrl: 'https://images.unsplash.com/photo-1598556856230-e830f3f6e1e6?q=80&w=600&auto=format&fit=crop', 
+    imageUrl: 'https://i.postimg.cc/Jn7PQ9wc/คนทรง.png', 
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -70,7 +70,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เป้าหมายคือการทำให้ตัวเองถูกโหวตประหารในตอนกลางวันเพื่อชนะเกม',
     quote: 'โหวตข้าสิ! ฆ่าข้าเลย!',
     ability: 'ยั่วโมโห',
-    imageUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=600&auto=format&fit=crop', 
+    imageUrl: 'https://i.postimg.cc/V6sDF3yn/ต_วตลก.png', 
     alignment: 'Neutral',
     team: 'Solo'
   },
@@ -80,7 +80,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'ฆ่าใครก็ได้คืนละ 1 คน ชนะเมื่อเหลือรอดเป็นคนสุดท้าย',
     quote: 'ทุกคนคือเหยื่อ...',
     ability: 'ฆ่าไร้ปรานี',
-    imageUrl: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=600&auto=format&fit=crop', 
+    imageUrl: 'https://i.postimg.cc/zBD0k9mR/ฆาตกรต_อเน_อง_(Serial_Killer).png', 
     alignment: 'Evil',
     team: 'Solo'
   },
@@ -90,7 +90,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เป็นหมาป่า แต่เมื่อถูกผู้หยั่งรู้ส่องจะเห็นเป็น "ชาวบ้าน"',
     quote: 'เจ้าแยกข้าไม่ออกหรอก',
     ability: 'อำพรางตัวตน',
-    imageUrl: 'https://images.unsplash.com/photo-1560706834-bed18b14e365?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/Jn7PQ9wG/หมาป_าจำแลง.png',
     alignment: 'Evil',
     team: 'Team Werewolf',
     investigationResult: RoleType.VILLAGER
@@ -101,7 +101,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'มีน้ำยา 2 ขวด: "ยาชุบชีวิต" และ "ยาพิษ" ใช้ได้อย่างละครั้งตลอดทั้งเกม',
     quote: 'จะอยู่หรือตาย... ขึ้นอยู่กับข้า',
     ability: 'ใช้ยา',
-    imageUrl: 'https://images.unsplash.com/photo-1596700871966-26792da07981?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/C1Mm4Wy1/แม_มด.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -111,7 +111,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เลือกผูกวิญญาณกับผู้เล่น 1 คน หากคนนั้นตาย คุณจะตายด้วย',
     quote: 'เราจะอยู่และตายไปด้วยกัน',
     ability: 'ผูกวิญญาณ',
-    imageUrl: 'https://images.unsplash.com/photo-1599488615731-7e5c2823528e?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/vmt0fGKT/หมาป_าค.png',
     alignment: 'Evil',
     team: 'Team Werewolf'
   },
@@ -121,7 +121,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เลือกผู้เล่น 1 คน หากคนนั้นตาย คุณจะสวมรอยรับบทบาทของเขา',
     quote: 'ข้าคือเงาของเจ้า',
     ability: 'สวมรอย',
-    imageUrl: 'https://images.unsplash.com/photo-1542259681-d41a8a4eb4f9?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/tgNBW9cy/จอมโจร.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -131,7 +131,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เป็นชาวบ้านธรรมดา จนกว่าผู้หยั่งรู้ตัวจริงจะตาย คุณถึงจะได้รับพลัง',
     quote: 'ข้ารอเวลาของข้า',
     ability: 'รับสืบทอด',
-    imageUrl: 'https://images.unsplash.com/photo-1518176258769-f227c798150e?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/9fYLZck5/ผ_หย_งร_ฝ_กห_ด.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -141,7 +141,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'รู้ว่าใครเป็นหมาป่า แต่หมาป่าไม่รู้ว่าคุณคือใคร ช่วยปั่นป่วนให้หมาป่าชนะ',
     quote: 'เพื่อนายท่าน!',
     ability: 'รู้ตัวหมาป่า',
-    imageUrl: 'https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/d0j5rJxg/ล_กสม_น.png',
     alignment: 'Evil',
     team: 'Team Werewolf'
   },
@@ -151,7 +151,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'ไม่รู้บทบาทจริงของตัวเอง จนกว่าจะถึงคืนที่ 3',
     quote: 'เอิ้ก... มึนไปหมด',
     ability: 'ไม่รู้ตัวตน',
-    imageUrl: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/zfFxKqc0/ข_เมา.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -161,7 +161,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'ตรวจสอบผู้เล่น 1 คน ถ้าเป็นหมาป่าจะฆ่าทิ้งทันที ถ้าไม่ใช่คุณจะตายเอง',
     quote: 'พระเจ้าจะตัดสินเจ้า',
     ability: 'ชำระบาป',
-    imageUrl: 'https://images.unsplash.com/photo-1605806616949-1e87b487bc2a?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/5tVPXXnT/น_กบวช.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -171,7 +171,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เลือกก่อกวนในคืนใดก็ได้ 1 ครั้ง ทำให้วันรุ่งขึ้นมีการโหวตตาย 2 คน',
     quote: 'มาเล่นอะไรสนุกๆ กันดีกว่า',
     ability: 'ก่อกวน',
-    imageUrl: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/fbNHVVB7/ต_วป_วน.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -181,7 +181,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'ตื่นขึ้นมาดูว่าผู้เล่นที่นั่งติดกันซ้ายขวา ลุกออกไปทำแอคชั่นหรือไม่',
     quote: 'ใครตื่นอยู่บ้างนะ?',
     ability: 'เฝ้าสังเกต',
-    imageUrl: 'https://images.unsplash.com/photo-1517865288-978fcb780652?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/pdH0mmqD/คนนอนไม_หล_บ.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -191,7 +191,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'ตื่นมาเจอเพื่อนที่เป็น Mason ด้วยกัน ทำให้มั่นใจว่าเพื่อนไม่ใช่หมาป่า',
     quote: 'เรารู้ไส้รู้พุงกันดี',
     ability: 'รู้จักพวกพ้อง',
-    imageUrl: 'https://images.unsplash.com/photo-1533613220915-609f661a6fe1?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/CKgvRRmR/สมาคม_Mason.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -205,7 +205,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'หากถูกโหวตประหารในตอนกลางวัน จะไม่ตายและเปิดเผยตัวตนว่าเป็นเจ้าชาย (แต่ถ้าโดนฆ่ากลางคืนตายปกติ)',
     quote: 'พวกเจ้ากล้าดียังไง!',
     ability: 'ราชศักดิ์',
-    imageUrl: 'https://images.unsplash.com/photo-1590529884988-cb946f48a9d1?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/1zQW88JV/เจ_าชาย.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -215,7 +215,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เลือก 1 คน ถ้าเป็นหมาป่า หมาป่าตาย ถ้าไม่ใช่หมาป่า คุณตายเอง',
     quote: 'ข้าจะกระชากหน้ากากเจ้า',
     ability: 'เปิดโปง',
-    imageUrl: 'https://images.unsplash.com/photo-1503249023995-51b0f3778ccf?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/8zWKkRBP/ผ_เป_ดเผยตน.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -225,7 +225,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เลือกผู้เล่น 1 คน เป้าหมายจะถูก "ใบ้" ในวันถัดไป (พูดไม่ได้ โหวตไม่ได้)',
     quote: 'จงเงียบเสียงลง...',
     ability: 'ร่ายเวทใบ้',
-    imageUrl: 'https://images.unsplash.com/photo-1549497552-320d77d70eb0?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/RV2pzsfC/ผ_ร_ายเวท.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -235,7 +235,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'หากถูกหมาป่ากัด จะยังไม่ตายทันที แต่จะไปตายในคืนถัดไปแทน',
     quote: 'แค่นี้ไม่เจ็บหรอก',
     ability: 'อึดถึกทน',
-    imageUrl: 'https://images.unsplash.com/photo-1570158268183-f29e7bbc7372?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/MKg38PRw/หน_มบ_ก.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -245,7 +245,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'คุณต้องโหวตประหารทุกวัน ห้ามงดออกเสียง',
     quote: 'เอ๊ะ? ต้องโหวตเหรอ? งั้นโหวตเจ้านั่น!',
     ability: 'บ้าบอ',
-    imageUrl: 'https://images.unsplash.com/photo-1499996860823-5214fcc65f8f?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/3JzfHSp5/ชาวบ_านโง.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -255,7 +255,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เป็นฝ่ายชาวบ้าน แต่เมื่อผู้หยั่งรู้ส่องจะเห็นว่าเป็น "หมาป่า"',
     quote: 'ข้าไม่ใช่ปีศาจ... เชื่อข้าเถอะ',
     ability: 'เลือดผสม',
-    imageUrl: 'https://images.unsplash.com/photo-1560706834-bed18b14e365?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/L6GQMCPx/ล_กคร_งหมา.png',
     alignment: 'Good',
     team: 'Team Villager',
     investigationResult: RoleType.WEREWOLF
@@ -268,17 +268,17 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เหมือนหมาป่าปกติ แต่ชนะเมื่อเป็นหมาป่าตัวสุดท้ายที่เหลือรอด (หรือเหลือรอดคนเดียว)',
     quote: 'ข้าไม่ต้องการฝูง',
     ability: 'ทรยศ',
-    imageUrl: 'https://images.unsplash.com/photo-1596796929949-a2e6f4244222?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/MKn3N2nY/หมาป_าเด_ยวดาย.png',
     alignment: 'Evil',
     team: 'Team Werewolf (Solo Win)'
   },
   [RoleType.TANNER]: {
     type: RoleType.TANNER,
     name: 'คนบ้า (Tanner)',
-    description: 'ชนะเกมทันทีหากตัวเองตาย (ไม่ว่าจะโดนโหวตหรือโดนฆ่า)',
+    description: 'ชนะเกมทันทีหากตัวเองตาย (ต้องโดยโหวตออกเท่านั้น)',
     quote: 'ความตายคือชัยชนะ',
     ability: 'อยากตาย',
-    imageUrl: 'https://images.unsplash.com/photo-1589578527966-8178a3181841?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/NfKCSqKK/คนบ_า.png',
     alignment: 'Neutral',
     team: 'Solo'
   },
@@ -290,7 +290,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เริ่มต้นเป็นชาวบ้าน หากถูกหมาป่ากัดจะไม่ตาย แต่จะกลายเป็นหมาป่าแทน',
     quote: 'คำสาปในกายข้า... มันรอวันตื่น',
     ability: 'กลายพันธุ์',
-    imageUrl: 'https://images.unsplash.com/photo-1601513445506-2ab0d4942d9c?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/KvCpyqTd/ผ_โดนสาบ.png',
     alignment: 'Good',
     team: 'Team Villager'
   },
@@ -300,7 +300,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'คืนแรกเลือกเป้าหมาย 1 คน หากคนนั้นตาย คุณจะได้รับบทบาทและความสามารถของเขามา',
     quote: 'ข้าจะเป็นเจ้า... ดีกว่าเจ้า',
     ability: 'เลียนแบบ',
-    imageUrl: 'https://images.unsplash.com/photo-1550133730-69524bb8e48d?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/gkxtQFxH/ด_อพเพ_ลเก_งเงอร.png',
     alignment: 'Neutral',
     team: 'Unknown'
   },
@@ -312,7 +312,7 @@ export const ROLES: Record<RoleType, Role> = {
     description: 'เป็นหมาป่า หากถูกฆ่าตาย คืนถัดไปหมาป่าจะฆ่าคนได้ 2 คน',
     quote: 'แม่จ๋า... ช่วยด้วย',
     ability: 'เรียกพวก',
-    imageUrl: 'https://images.unsplash.com/photo-1582236528892-74c0a1f94a97?q=80&w=600&auto=format&fit=crop',
+    imageUrl: 'https://i.postimg.cc/J76dp4z4/ล_กหมาป_า.png',
     alignment: 'Evil',
     team: 'Team Werewolf'
   },
